@@ -52,7 +52,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Rifle",
+                    "name": "Firearm",
                     "type": "Button",
                     "id": "14dca3da-7856-408d-b5fc-e8a4d46ac1bc",
                     "expectedControlType": "",
@@ -331,7 +331,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Rifle",
+                    "action": "Firearm",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -342,7 +342,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Rifle",
+                    "action": "Firearm",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -352,7 +352,7 @@
                     "path": "<Mouse>/rightButton",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
+                    "groups": ";Keyboard&Mouse",
                     "action": "Aim",
                     "isComposite": false,
                     "isPartOfComposite": false

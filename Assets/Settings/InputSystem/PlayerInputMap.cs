@@ -138,7 +138,7 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""Rifle"",
+                    ""name"": ""Firearm"",
                     ""type"": ""Button"",
                     ""id"": ""14dca3da-7856-408d-b5fc-e8a4d46ac1bc"",
                     ""expectedControlType"": """",
@@ -417,7 +417,7 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard&Mouse"",
-                    ""action"": ""Rifle"",
+                    ""action"": ""Firearm"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -428,7 +428,7 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""Rifle"",
+                    ""action"": ""Firearm"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -438,7 +438,7 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
                     ""path"": ""<Mouse>/rightButton"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": "";Keyboard&Mouse"",
                     ""action"": ""Aim"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -1032,7 +1032,7 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
         m_Player_Fire = m_Player.FindAction("Fire", throwIfNotFound: true);
         m_Player_MouseScroll = m_Player.FindAction("Mouse Scroll", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
-        m_Player_Rifle = m_Player.FindAction("Rifle", throwIfNotFound: true);
+        m_Player_Firearm = m_Player.FindAction("Firearm", throwIfNotFound: true);
         m_Player_Aim = m_Player.FindAction("Aim", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
@@ -1132,7 +1132,7 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Fire;
     private readonly InputAction m_Player_MouseScroll;
     private readonly InputAction m_Player_Jump;
-    private readonly InputAction m_Player_Rifle;
+    private readonly InputAction m_Player_Firearm;
     private readonly InputAction m_Player_Aim;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
@@ -1166,9 +1166,9 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
         /// </summary>
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
         /// <summary>
-        /// Provides access to the underlying input action "Player/Rifle".
+        /// Provides access to the underlying input action "Player/Firearm".
         /// </summary>
-        public InputAction @Rifle => m_Wrapper.m_Player_Rifle;
+        public InputAction @Firearm => m_Wrapper.m_Player_Firearm;
         /// <summary>
         /// Provides access to the underlying input action "Player/Aim".
         /// </summary>
@@ -1214,9 +1214,9 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
             @Jump.started += instance.OnJump;
             @Jump.performed += instance.OnJump;
             @Jump.canceled += instance.OnJump;
-            @Rifle.started += instance.OnRifle;
-            @Rifle.performed += instance.OnRifle;
-            @Rifle.canceled += instance.OnRifle;
+            @Firearm.started += instance.OnFirearm;
+            @Firearm.performed += instance.OnFirearm;
+            @Firearm.canceled += instance.OnFirearm;
             @Aim.started += instance.OnAim;
             @Aim.performed += instance.OnAim;
             @Aim.canceled += instance.OnAim;
@@ -1246,9 +1246,9 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
             @Jump.started -= instance.OnJump;
             @Jump.performed -= instance.OnJump;
             @Jump.canceled -= instance.OnJump;
-            @Rifle.started -= instance.OnRifle;
-            @Rifle.performed -= instance.OnRifle;
-            @Rifle.canceled -= instance.OnRifle;
+            @Firearm.started -= instance.OnFirearm;
+            @Firearm.performed -= instance.OnFirearm;
+            @Firearm.canceled -= instance.OnFirearm;
             @Aim.started -= instance.OnAim;
             @Aim.performed -= instance.OnAim;
             @Aim.canceled -= instance.OnAim;
@@ -1588,12 +1588,12 @@ public partial class @PlayerInputMap: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnJump(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "Rifle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Firearm" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnRifle(InputAction.CallbackContext context);
+        void OnFirearm(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Aim" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

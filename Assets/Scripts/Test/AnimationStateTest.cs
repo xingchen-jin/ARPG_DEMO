@@ -5,7 +5,7 @@ using UnityEngine;
 public class AnimationStateTest : MonoBehaviour
 {
     Animator animator;
-        PlayerInputMap playerInputMap;
+    PlayerInputMap playerInputMap;
     void Start()
     {
         animator = GetComponent<Animator>();

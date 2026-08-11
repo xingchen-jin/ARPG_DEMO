@@ -8,4 +8,5 @@ public struct PlayerInputData
     public bool jumpInput;
     public bool attackInput;
     public bool RifleInput;
+    public bool aimInput;
 }
