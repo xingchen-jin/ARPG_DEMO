@@ -30,18 +30,14 @@ public class PlayerFSMContext : FSMContext
     public float RunSpeed{
         get { return runSpeed; }
     }
-    [SerializeField] private float jumpForce;
-    public float JumpForce{
-        get { return jumpForce; }
-    }
+
     #endregion
 
     #region 状态机参数
-    [HideInInspector]public bool isGrounded;
-    [HideInInspector]public bool isJumping;
+    // [HideInInspector]public bool isGrounded;
+    // [HideInInspector]public bool isJumping;
     // [HideInInspector]public bool isFirearm; //持枪状态
-    // [HideInInspector]public bool isAiming;  //正在瞄准，区分于输入瞄准请求
-    [HideInInspector]public bool isFiring;  
+    // [HideInInspector]public bool isAiming;  //正在瞄准，区分于输入瞄准请求 
     [HideInInspector]public bool canRun;
     [HideInInspector]public bool canRoate;//TODO：判断是否可以旋转，后续如果考虑新加状态则废弃
 
@@ -59,6 +55,28 @@ public class PlayerFSMContext : FSMContext
 
     public TwoBoneIKConstraint leftHandIK;
     public TwoBoneIKConstraint rightHandIK;
+    public MultiAimConstraint handAim;
 
+    #endregion
+
+    #region 瞄准相关
+    public Transform aimPivot;
+    public Transform firePoint;
+    // 瞄准时的俯仰角度
+    public float aimPitchMin = -30f;
+    public float aimPitchMax = 30f;
+    public float aimPitch = 0;
+    
+    public float mouseSensitivity = 2f;// 鼠标灵敏度
+    #endregion
+    
+    #region 重力与跳跃系统
+    public float gravity = -9.8f;
+    public float verticalSpeed = 0;
+    public bool isGround;
+    [SerializeField] private float initVerticalSpeed; //初始速度
+    public float InitVerticalSpeed{
+        get { return initVerticalSpeed; }
+    }
     #endregion
 }

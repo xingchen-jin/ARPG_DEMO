@@ -26,9 +26,6 @@ public class CinemachineController : MonoBehaviour
         framingTransposer.m_CameraDistance = defaultDistance;
         targetDistance = defaultDistance;
 
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
-
         playerInputMap = new PlayerInputMap();
         playerInputMap.Enable();
     }

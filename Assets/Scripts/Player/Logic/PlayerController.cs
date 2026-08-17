@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Cinemachine;
-using MyFSM;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -18,6 +14,10 @@ public class PlayerController : MonoBehaviour
     private WeaponFSM weaponFSM;
 
     public PlayerFSMContext ctx;
+    #region 基础参数
+    
+
+    #endregion
 
     void Start()
     {
@@ -27,11 +27,6 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
 
         ctx.controller = controller;
-
-        animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
-        animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
 
         //给FSMContext赋值
         ctx.animator = animator;
@@ -79,6 +74,28 @@ public class PlayerController : MonoBehaviour
             ctx.input.aimInput = animator.GetBool("isAiming") ? false : true;
         }
     }
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        ctx.input.lookInput = context.ReadValue<Vector2>();
+    }
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        switch (context.phase)
+        {
+            case InputActionPhase.Started:
+                Debug.Log("OnFire: 按下");
+                ctx.input.fireInput = true;
+                break;
+            case InputActionPhase.Canceled:
+                Debug.Log("OnFire: 松开");
+                ctx.input.fireInput = false;
+                break;
+            case InputActionPhase.Performed:
+                Debug.Log("OnFire: 长按");
+                ctx.input.fireInput = true;
+                break;
+        }
+    }
     #endregion
 
 
@@ -97,6 +114,7 @@ public class PlayerController : MonoBehaviour
     {
         movementFSM.OnFixedUpdate();
         weaponFSM.OnFixedUpdate();
+        // Gravity();
     }
     private void OnDestroy()
     {
@@ -113,4 +131,12 @@ public class PlayerController : MonoBehaviour
         animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
 
     }
+    // void Gravity()
+    // {
+    //     //TODO: 地面检测后续更改，重力效果也可以改
+    //     if (!controller.isGrounded)
+    //     {
+    //         controller.Move(new Vector3(0, gravity * Time.fixedDeltaTime, 0));
+    //     }
+    // }
 }

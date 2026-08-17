@@ -63,7 +63,7 @@ public class LocomotionState : IState
         
         //TODO:修改八向位移速时修改,0.2f为魔法数字，绝不是懒不想定义变量
         playerFSMContext.animator.SetFloat(AnimatorID.HorizontalSpeedID,moveInput.x,0.2f,Time.fixedDeltaTime);
-        playerFSMContext.animator.SetFloat(AnimatorID.VerticalSpeedID,moveInput.y,0.2f,Time.fixedDeltaTime);
+        playerFSMContext.animator.SetFloat(AnimatorID.  ForwardSpeedID,moveInput.y,0.2f,Time.fixedDeltaTime);
 
         
         //获取相机的前向和右向向量
@@ -73,7 +73,7 @@ public class LocomotionState : IState
         camForward.y = 0;camRight.y = 0;
         camForward.Normalize();camRight.Normalize();
         
-        //TODO:后续有合适动画改为根运动方式
+        //TODO:后续有合适动画改为根运动方式，现在就是屎
         if(playerFSMContext.canRoate){
             //移动反向
             Vector3 moveDir = (camForward*moveInput.y + camRight*moveInput.x).normalized;

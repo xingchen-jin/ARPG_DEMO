@@ -117,7 +117,7 @@ BlendTree:
     m_DirectBlendParameter: Vertical Speed
     m_Mirror: 0
   m_BlendParameter: Horizontal Speed
-  m_BlendParameterY: Vertical Speed
+  m_BlendParameterY: Forward Speed
   m_MinThreshold: 0
   m_MaxThreshold: 15.5
   m_UseAutomaticThresholds: 0
@@ -261,6 +261,12 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
+  - m_Name: Forward Speed
+    m_Type: 1
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
   - m_Name: Horizontal Speed
     m_Type: 1
     m_DefaultFloat: 0
@@ -310,18 +316,6 @@ AnimatorController:
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
-  - serializedVersion: 5
-    m_Name: Hands Targets
-    m_StateMachine: {fileID: 3872725513863539398}
-    m_Mask: {fileID: 0}
-    m_Motions: []
-    m_Behaviours: []
-    m_BlendingMode: 0
-    m_SyncedLayerIndex: -1
-    m_DefaultWeight: 1
-    m_IKPass: 0
-    m_SyncedLayerAffectsTiming: 0
-    m_Controller: {fileID: 9100000}
 --- !u!1107 &161616599999356534
 AnimatorStateMachine:
   serializedVersion: 6
@@ -339,7 +333,7 @@ AnimatorStateMachine:
     m_Position: {x: 290, y: 10, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1278178980841175433}
-    m_Position: {x: 290, y: -100, z: 0}
+    m_Position: {x: 290, y: -110, z: 0}
   m_ChildStateMachines: []
   m_AnyStateTransitions: []
   m_EntryTransitions: []
@@ -542,6 +536,9 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 2
     m_ConditionEvent: isFirearm
+    m_EventTreshold: 0
+  - m_ConditionMode: 2
+    m_ConditionEvent: isAiming
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 1318387995594765499}
