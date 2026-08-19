@@ -17,7 +17,7 @@ public class AimTargetUpdater : MonoBehaviour
 
 
 
-    void Update()
+    void LateUpdate()
     {
         Ray ray = new Ray(aimCamera.transform.position, aimCamera.transform.forward);
         if (Physics.Raycast(ray, out RaycastHit hitInfo, maxDistance, aimLayerMask))

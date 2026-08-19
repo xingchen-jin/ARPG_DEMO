@@ -12,5 +12,6 @@ public struct PlayerInputData
     public bool RifleInput;
     public bool aimInput;
     public bool fireInput;
+    public bool crouchInput;
 
 }

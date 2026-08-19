@@ -9,6 +9,8 @@ public class CameraManager : Singleton<CameraManager>
     [SerializeField] private CinemachineVirtualCamera normalCamera;
     [SerializeField] private CinemachineVirtualCamera aimCamera;
     [SerializeField] private Transform aimTargetTransform;
+    public Camera MainCamera => mainCamera;
+    
     public Transform AimTargetTransform => aimTargetTransform;
     void Start()
     {

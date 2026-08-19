@@ -1,35 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using MyFSM;
-using UnityEditor.Callbacks;
 using UnityEngine;
 
-
-/// <summary>
-/// 基础移动状态
-/// </summary>
-public class LocomotionState : IState
+public class CrouchingState : IState
 {
-    private PlayerFSMContext ctx;
-    private Vector2 moveInput;
+    PlayerFSMContext ctx;
     private float maxSpeed;
-    
-    public LocomotionState(PlayerFSMContext ctx)
+    Vector2 moveInput;
+    public CrouchingState(PlayerFSMContext ctx)
     {
         this.ctx = ctx;
-
     }
-
-    #region IState
     public void OnEnter()
     {
-        // moveInput = Vector2.zero;//初始化移动输入为零，防止在进入移动状态时立即移动,这也导致进入移动状态至少隔离一帧才会移动
-        maxSpeed = ctx.RunSpeed;
+        //动画机
+        ctx.animator.SetBool(AnimatorID.IsCrouchingID, true);
+        //设置最大速度为蹲下速度
+        maxSpeed = ctx.CrouchSpeed;
+
     }
 
     public void OnExit()
     {
-        
+        ctx.animator.SetBool(AnimatorID.IsCrouchingID, false);
     }
 
     public void OnFixedUpdate()
@@ -37,22 +31,17 @@ public class LocomotionState : IState
         Move();
     }
 
-
     public void OnUpdate()
     {
-
         PlayerInputData inputData = ctx.input;
         moveInput = inputData.moveInput;
         inputData.moveInput = Vector2.zero;//清空输入，防止重复读取
         //根据输入值调整当前速度,手柄推动的幅度越大，速度越快
         ctx.targetSpeed = moveInput.magnitude*maxSpeed;
 
-        Debug.Log("targetSpeed "+ctx.targetSpeed);
     }
-    #endregion
-
     #region Methods
-    void Move()
+     void Move()
     {
         ctx.curSpeed = Mathf.Lerp(ctx.curSpeed, ctx.targetSpeed, 3f * Time.fixedDeltaTime);
         if (ctx.curSpeed < 0.1f)
@@ -65,7 +54,6 @@ public class LocomotionState : IState
         //TODO:修改八向位移速时修改,0.2f为魔法数字，绝不是懒不想定义变量
         ctx.animator.SetFloat(AnimatorID.HorizontalSpeedID,moveInput.x,0.2f,Time.fixedDeltaTime);
         ctx.animator.SetFloat(AnimatorID.ForwardSpeedID,moveInput.y,0.2f,Time.fixedDeltaTime);
-
         
         //获取相机的前向和右向向量
         Transform cam = Camera.main.transform;

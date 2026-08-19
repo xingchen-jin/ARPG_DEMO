@@ -6,10 +6,10 @@ using UnityEngine;
 public class WeaponAimingState : IState
 {
     private PlayerFSMContext ctx;
-    //TODO:Éä»÷Ïà¹Ø£¬ºóĞø¶àÎäÆ÷Ê±£¬ĞŞ¸ÄÎªÊı¾İÇı¶¯
-    private float roundsPerMinute = 600f; //Ã¿·ÖÖÓÉä»÷´ÎÊı
-    private float FireInterval => 60f / roundsPerMinute; //Éä»÷¼ä¸ôÊ±¼ä
-    private float gunTimer = 0f; //Éä»÷¼ÆÊ±Æ÷
+    
+    private float roundsPerMinute = 600f; 
+    private float FireInterval => 60f / roundsPerMinute; 
+    private float gunTimer = 0f; 
 
     public WeaponAimingState(PlayerFSMContext ctx)
     {
@@ -18,9 +18,23 @@ public class WeaponAimingState : IState
 
     public void OnEnter()
     {
-       ctx.animator.SetBool("isFirearm", false);
-       ctx.animator.SetBool("isAiming", true);
-       //ÉèÖÃRiggingÈ¨ÖØ
+        //æ—‹è½¬åˆ°ç›¸æœºå‰æ–¹
+        Camera cam = CameraManager.Instance.MainCamera;
+        if(cam!=null)
+        {
+            //è®¡ç®—ä¿¯è§’
+            Vector3 targetPosition = GetAimTargetPosition();
+            AlignPlayerToTarget(targetPosition);
+            
+        }
+        else
+        {
+            Debug.LogWarning("æ²¡æœ‰æ‰¾åˆ°ä¸»ç›¸æœºï¼Œè¯·ç¡®ä¿åœºæ™¯ä¸­æœ‰ä¸€ä¸ªæ ‡è®°ä¸ºMainCameraçš„ç›¸æœºã€‚");
+        }
+        
+       ctx.animator.SetBool(AnimatorID.IsFirearmID, false);
+       ctx.animator.SetBool(AnimatorID.IsAimingID, true);
+       //rigging
         ctx.leftHandIK.weight = 1;
         ctx.rightHandIK.weight = 1;
         ctx.handAim.weight = 1;
@@ -29,11 +43,13 @@ public class WeaponAimingState : IState
        ctx.canRoate = false;
 
         CameraManager.Instance.SwitchToAimCamera();
+
+        ctx.weapon.SetActive(true);
     }
 
     public void OnExit()
     {
-        ctx.animator.SetBool("isAiming", false);
+        ctx.animator.SetBool(AnimatorID.IsAimingID, false);
         ctx.canRun = true;
         ctx.canRoate = true;
 
@@ -45,10 +61,10 @@ public class WeaponAimingState : IState
     public void OnFixedUpdate()
     {
         Vector2 delta = ctx.input.lookInput*ctx.mouseSensitivity*Time.fixedDeltaTime;
-        //Ë®Æ½Ğı×ª½ÇÉ«
-        // Debug.Log($"Ë®Æ½Ğı×ª½ÇÉ«:{delta.x}");
+        //æ°´å¹³æ—‹è½¬
         ctx.playerTransform.Rotate(Vector3.up, delta.x);
-        //¸©½ÇĞı×ª
+
+        //ä¿¯è§’æ—‹è½¬
         ctx.aimPitch -= delta.y;
         ctx.aimPitch = Mathf.Clamp(ctx.aimPitch, ctx.aimPitchMin, ctx.aimPitchMax);
         ctx.aimPivot.localRotation = Quaternion.Euler(ctx.aimPitch, 0, 0);
@@ -62,25 +78,56 @@ public class WeaponAimingState : IState
             Fire();
 
         }
-
     }
+    private Vector3 GetAimTargetPosition()
+    {
+        Camera cam = Camera.main; // å½“å‰è‡ªç”±è§†è§’ç›¸æœº
+        Ray ray = cam.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 100f))
+            return hit.point;
+        else
+            return ray.GetPoint(50f); // æœªå‘½ä¸­æ—¶å–è¿œå¤„å›ºå®šç‚¹
+    }
+    private void AlignPlayerToTarget(Vector3 targetPosition)
+    {
+        Transform playerTransform = ctx.playerTransform;
+        Transform aimPivot = ctx.aimPivot;
+        //è®¡ç®—ä»å½“å‰ä½ç½®æŒ‡å‘ç›®æ ‡çš„æ–¹å‘
+        Vector3 direction = (targetPosition - playerTransform.position).normalized;
+        //æ°´å¹³æ–¹å‘
+        Vector3 horizontalDir = new Vector3(direction.x, 0, direction.z).normalized;
+        if(horizontalDir.sqrMagnitude < 0.001f)
+            horizontalDir = playerTransform.forward; //é¿å…æ–¹å‘ä¸ºé›¶å‘é‡
+        //è®¾ç½®è§’è‰²çš„æ°´å¹³æ—‹è½¬ï¼Œä½¿å…¶é¢å‘ç›®æ ‡
+        playerTransform.rotation = Quaternion.LookRotation(horizontalDir);
+        // è®¡ç®—ä¿¯ä»°è§’ï¼ˆè§’åº¦åˆ¶ï¼‰
+        ctx.aimPitch = -Mathf.Asin(direction.y) * Mathf.Rad2Deg;
+        ctx.aimPitch = Mathf.Clamp(ctx.aimPitch, ctx.aimPitchMin, ctx.aimPitchMax);
+        // è®¾ç½® AimPivot æœ¬åœ°æ—‹è½¬ï¼ˆæ³¨æ„ç¬¦å·ï¼Œå¯èƒ½éœ€è¦ -pitchï¼‰
+        aimPivot.localRotation = Quaternion.Euler(ctx.aimPitch, 0, 0);
+    }
+
+
     private void Fire()
     {
         if (gunTimer <= 0f)
         {
-            //Éú³É×Óµ¯
+            //è·å–å­å¼¹å¯¹è±¡å¹¶åˆå§‹åŒ–
             Bullet bullet = BulletPoolManager.Instance.GetBullet(BulletType.Rifle);
             Vector3 firePosition = ctx.firePoint.position;
             Vector3 targetPosition = CameraManager.Instance.AimTargetTransform.position;
             Vector3 fireDirection = (targetPosition - firePosition).normalized;
 
-            bullet.Init(firePosition, fireDirection, 20f);//TODO: ÕâÀïµÄËÙ¶È¿ÉÒÔ´ÓÎäÆ÷Êı¾İÖĞ»ñÈ¡
+            bullet.Init(firePosition, fireDirection, 20f);//TODO: ç¡¬ç¼–ç ï¼Œåç»­å¯ä»¥è€ƒè™‘åœ¨æ­¦å™¨æ•°æ®ä¸­é…ç½®å­å¼¹é€Ÿåº¦
             SoundEffectPoolManager.Instance.OnPlayerSound(SoundEffectType.RifleFire, firePosition);
-            //ÖØÖÃÉä»÷¼ÆÊ±Æ÷
+            //å¼€ç«è®¡æ—¶å™¨
             gunTimer = FireInterval;
         }else
         {
             gunTimer -= Time.deltaTime;
         }
     }
+
+    
 }
