@@ -3,36 +3,59 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class CrouchingState : IState
+public class CrouchingState : StateBase
 {
     PlayerFSMContext ctx;
     private float maxSpeed;
     Vector2 moveInput;
+    private Vector3 originalControllerCenter;
+    private float originalControllerHeight;
+    private float originalControllerRadius;
     public CrouchingState(PlayerFSMContext ctx)
     {
         this.ctx = ctx;
     }
-    public void OnEnter()
+    public override void OnEnter()
     {
         //动画机
         ctx.animator.SetBool(AnimatorID.IsCrouchingID, true);
         //设置最大速度为蹲下速度
         maxSpeed = ctx.CrouchSpeed;
+        //保存当前胶囊体高度和半径
+        originalControllerHeight = ctx.controller.height;
+        originalControllerCenter = ctx.controller.center;
+        originalControllerRadius = ctx.controller.radius;
+        //修改胶囊体高度为蹲下高度,刚开始时使用静止状态下的高度缩放倍数
+        ctx.controller.height = ctx.controller.height * ctx.crouchingHeightMult_Idle;
+        ctx.controller.center = new Vector3(ctx.controller.center.x, ctx.controller.center.y * ctx.crouchingHeightMult_Idle, ctx.controller.center.z);
+
+        //修改胶囊体半径
+        ctx.controller.radius = ctx.controller.radius * ctx.crouchingRadiusMult_Idle;
+
+
 
     }
 
-    public void OnExit()
+    public override void OnExit()
     {
         ctx.animator.SetBool(AnimatorID.IsCrouchingID, false);
+        ctx.controller.height = originalControllerHeight;
+        ctx.controller.center = originalControllerCenter;
+        ctx.controller.radius = originalControllerRadius;
     }
 
-    public void OnFixedUpdate()
+    public override void OnFixedUpdate()
     {
         Move();
     }
 
-    public void OnUpdate()
+    public override void OnUpdate()
     {
+        // //根据头顶位置获取胶囊体高度（性能开销过大）
+        // float headHeight = ctx.headPivot.position.y - ctx.playerTransform.position.y;
+        // ctx.controller.height = headHeight;
+        // ctx.controller.center = new Vector3(ctx.controller.center.x, headHeight / 2f, ctx.controller.center.z);
+
         PlayerInputData inputData = ctx.input;
         moveInput = inputData.moveInput;
         inputData.moveInput = Vector2.zero;//清空输入，防止重复读取
@@ -44,7 +67,7 @@ public class CrouchingState : IState
      void Move()
     {
         ctx.curSpeed = Mathf.Lerp(ctx.curSpeed, ctx.targetSpeed, 3f * Time.fixedDeltaTime);
-        if (ctx.curSpeed < 0.1f)
+        if (ctx.curSpeed < 0.01f)
         {
             ctx.curSpeed = 0f;
         }

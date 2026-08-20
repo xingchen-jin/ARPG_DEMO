@@ -485,7 +485,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &143278102
 Transform:
   m_ObjectHideFlags: 0
@@ -4077,6 +4077,37 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 741715687}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &646610805
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 646610806}
+  m_Layer: 2
+  m_Name: Head Pivot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &646610806
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 646610805}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.5003706, y: 0.49962482, z: 0.500375, w: 0.49962908}
+  m_LocalPosition: {x: 0.05729279, y: -0.029820234, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 15376191}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &652635226 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4170096854407115076, guid: de735ef75fd9c6d45ad37ef91f25cd9b,
@@ -6588,6 +6619,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2023638631}
+    - targetCorrespondingSourceObject: {fileID: 4467844530315576275, guid: de735ef75fd9c6d45ad37ef91f25cd9b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 646610806}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: de735ef75fd9c6d45ad37ef91f25cd9b,
         type: 3}
@@ -17734,7 +17769,7 @@ MonoBehaviour:
   ctx:
     walkSpeed: 1.5
     runSpeed: 3.5
-    crouchSpeed: 1.2
+    crouchSpeed: 1.4
     curSpeed: 0
     targetSpeed: 0
     canRun: 0
@@ -17747,6 +17782,7 @@ MonoBehaviour:
     rightHandIK: {fileID: 1345265219}
     handAim: {fileID: 1107055229}
     weapon: {fileID: 776472404}
+    headPivot: {fileID: 646610806}
     aimPivot: {fileID: 1885402007}
     firePoint: {fileID: 2043202574}
     aimPitchMin: -10
@@ -17755,13 +17791,17 @@ MonoBehaviour:
     mouseSensitivity: 6
     baseGravity: -9.81
     jumpGravityMultiplier: 1
-    fallGravityMultiplier: 1.8
+    fallGravityMultiplier: 2
     jumpDispMultiplier: 1.2
     verticalSpeed: 0
     isGrounded: 0
-    initVerticalSpeed: 4
+    initVerticalSpeed: 5
     groundCheckDistance: 0.1
     planarDisplacement: {x: 0, y: 0, z: 0}
+    crouchingHeightMultiplier: 0.75
+    crouchingRadiusMultiplier: 1.74
+    crouchingIdleHeightMultiplier_Fwd: 0.52
+    crouchingRadiusMultiplier_Idle: 1.74
 --- !u!114 &1690552495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17972,7 +18012,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1690552488}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2d8418b0b9634b1892b0268dd9c2743, type: 3}
   m_Name: 

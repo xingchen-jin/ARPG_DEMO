@@ -65,7 +65,11 @@ namespace MyFSM
         {
             curState?.OnFixedUpdate();
         }
-
+        public void OnLateUpdate()
+        {
+            curState?.OnLateUpdate();
+        }
+        
         private void CheckTransition()
         {
             if (stateTransitionDict.TryGetValue(curStateType, out var transitions))

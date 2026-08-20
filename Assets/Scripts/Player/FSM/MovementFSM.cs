@@ -34,8 +34,11 @@ public class MovementFSM
         Debug.Log($"MovementFSM当前状态:{fsm.curStateType}");
         fsm.OnUpdate();
     }
-    public void OnFixedUpdate()=>fsm.OnFixedUpdate();
 
+    public void OnFixedUpdate()=>fsm.OnFixedUpdate();
+    public void OnLateUpdate()=>fsm.OnLateUpdate();
+
+    
     #region 状态机切换条件
     bool CanJump()
     {

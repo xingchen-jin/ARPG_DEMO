@@ -149,6 +149,11 @@ public class PlayerController : MonoBehaviour
         movementFSM.OnFixedUpdate();
         weaponFSM.OnFixedUpdate();
     }
+    void LateUpdate()
+    {
+        movementFSM.OnLateUpdate();
+        weaponFSM.OnLateUpdate();
+    }
     private void OnDestroy()
     {
         playerInputMap.Disable();
@@ -162,6 +167,10 @@ public class PlayerController : MonoBehaviour
         animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
         animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
         animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
+        animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
+        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
+        animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
+        animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
 
     }
 

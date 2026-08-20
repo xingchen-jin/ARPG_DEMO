@@ -65,6 +65,8 @@ public class PlayerFSMContext : FSMContext
     public MultiAimConstraint handAim;
     
     public GameObject weapon;
+    public Transform headPivot;//头顶位置
+
 
     #endregion
 
@@ -101,8 +103,11 @@ public class PlayerFSMContext : FSMContext
     [HideInInspector]public float groundCheckDistance = 0.1f; //地面检测距离
 
     [HideInInspector]public Vector3 planarDisplacement; //水平平面位移量,禁用根运动时使用
-    public float crouchingHeightMultiplier = 0.75f; //TODO:下蹲时胶囊体高度缩放倍数
+    public float crouchingHeightMult_Fwd = 0.52f; //下蹲时胶囊体高度缩放倍数
+    public float crouchingRadiusMult_Fwd = 1.74f; //下蹲时胶囊体半径缩放倍数
 
+    public float crouchingHeightMult_Idle = 0.75f; //下蹲时静止状态下的胶囊体高度缩放倍数
+    public float crouchingRadiusMult_Idle = 1.74f; //下蹲时静止状态下的胶囊体半径缩放倍数
     #endregion
     
 }

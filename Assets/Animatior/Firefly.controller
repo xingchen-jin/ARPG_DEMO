@@ -212,9 +212,9 @@ AnimatorStateMachine:
   m_AnyStateTransitions: []
   m_EntryTransitions: []
   m_StateMachineTransitions:
-  - first: {fileID: -4653323481794141329}
-    second: []
   - first: {fileID: -2796552898331537321}
+    second: []
+  - first: {fileID: -4653323481794141329}
     second: []
   m_StateMachineBehaviours: []
   m_AnyStatePosition: {x: 50, y: 20, z: 0}
@@ -954,7 +954,7 @@ BlendTree:
   m_Name: Move_Free
   m_Childs:
   - serializedVersion: 2
-    m_Motion: {fileID: -359718019515549578, guid: 5f832728154403c4a8500b7fdc9a75f4,
+    m_Motion: {fileID: -203655887218126122, guid: b764fd8f1aaa2e943889dc9fa03ae4bd,
       type: 3}
     m_Threshold: 0
     m_Position: {x: 0, y: 0}
@@ -963,7 +963,7 @@ BlendTree:
     m_DirectBlendParameter: Vertical Speed
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: -4143002631956505332, guid: 5f832728154403c4a8500b7fdc9a75f4,
+    m_Motion: {fileID: -203655887218126122, guid: fe3816b532afdb84a8269c0d40b6c3aa,
       type: 3}
     m_Threshold: 1
     m_Position: {x: 0, y: 0}

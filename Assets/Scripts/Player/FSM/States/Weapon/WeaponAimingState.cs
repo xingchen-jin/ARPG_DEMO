@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class WeaponAimingState : IState
+public class WeaponAimingState : StateBase
 {
     private PlayerFSMContext ctx;
     
@@ -16,7 +16,7 @@ public class WeaponAimingState : IState
         this.ctx = ctx;
     }
 
-    public void OnEnter()
+    public override void OnEnter()
     {
         //旋转到相机前方
         Camera cam = CameraManager.Instance.MainCamera;
@@ -47,7 +47,7 @@ public class WeaponAimingState : IState
         ctx.weapon.SetActive(true);
     }
 
-    public void OnExit()
+    public override void OnExit()
     {
         ctx.animator.SetBool(AnimatorID.IsAimingID, false);
         ctx.canRun = true;
@@ -58,7 +58,7 @@ public class WeaponAimingState : IState
         ctx.handAim.weight = 0;
     }
 
-    public void OnFixedUpdate()
+    public override void OnFixedUpdate()
     {
         Vector2 delta = ctx.input.lookInput*ctx.mouseSensitivity*Time.fixedDeltaTime;
         //水平旋转
@@ -71,7 +71,7 @@ public class WeaponAimingState : IState
 
     }
 
-    public void OnUpdate()
+    public override void OnLateUpdate()
     {
         if (ctx.input.fireInput)
         {
@@ -79,6 +79,8 @@ public class WeaponAimingState : IState
 
         }
     }
+
+    #region Methods
     private Vector3 GetAimTargetPosition()
     {
         Camera cam = Camera.main; // 当前自由视角相机
@@ -128,6 +130,7 @@ public class WeaponAimingState : IState
             gunTimer -= Time.deltaTime;
         }
     }
+    #endregion
 
     
 }

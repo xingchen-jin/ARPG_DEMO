@@ -8,7 +8,7 @@ using UnityEngine;
 /// <summary>
 /// 基础移动状态
 /// </summary>
-public class LocomotionState : IState
+public class LocomotionState : StateBase
 {
     private PlayerFSMContext ctx;
     private Vector2 moveInput;
@@ -21,24 +21,25 @@ public class LocomotionState : IState
     }
 
     #region IState
-    public void OnEnter()
+    public override void OnEnter()
     {
         // moveInput = Vector2.zero;//初始化移动输入为零，防止在进入移动状态时立即移动,这也导致进入移动状态至少隔离一帧才会移动
         maxSpeed = ctx.RunSpeed;
     }
 
-    public void OnExit()
+    public override void OnExit()
     {
         
     }
 
-    public void OnFixedUpdate()
+    public override void OnFixedUpdate()
     {
         Move();
     }
 
 
-    public void OnUpdate()
+
+    public override void OnUpdate()
     {
 
         PlayerInputData inputData = ctx.input;

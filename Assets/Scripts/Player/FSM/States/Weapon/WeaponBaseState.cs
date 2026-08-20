@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class WeaponBaseState : IState
+public class WeaponBaseState : StateBase
 {
     private PlayerFSMContext ctx;
 
@@ -12,7 +12,7 @@ public class WeaponBaseState : IState
         this.ctx = ctx;
 
     }
-    public void OnEnter()
+    public override void OnEnter()
     {
         ctx.animator.SetBool(AnimatorID.IsFirearmID, false);
         ctx.animator.SetBool(AnimatorID.IsAimingID, false);
@@ -24,16 +24,4 @@ public class WeaponBaseState : IState
         ctx.weapon.SetActive(false);
     }
 
-    public void OnExit()
-    {
-    }
-
-    public void OnFixedUpdate()
-    {
-   
-    }
-
-    public void OnUpdate()
-    {
-    }
 }

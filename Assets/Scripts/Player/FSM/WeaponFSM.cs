@@ -36,4 +36,5 @@ public class WeaponFSM : MonoBehaviour
         fsm.OnUpdate();
     }
     public void OnFixedUpdate()=>fsm.OnFixedUpdate();
+    public void OnLateUpdate()=>fsm.OnLateUpdate();
 }

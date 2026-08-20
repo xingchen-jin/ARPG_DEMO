@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class JumpState : IState
+public class JumpState : StateBase
 {
     private PlayerFSMContext ctx;
     private Vector2 moveInput;
@@ -13,7 +13,7 @@ public class JumpState : IState
         this.ctx = ctx;
 
     }
-    public void OnEnter()
+    public override void OnEnter()
     {
         ctx.verticalSpeed = ctx.InitVerticalSpeed;
         ctx.animator.SetBool(AnimatorID.IsJumpingID, true);
@@ -23,24 +23,13 @@ public class JumpState : IState
 
     }
 
-    public void OnExit()
+    public override void OnExit()
     {
-        ctx.verticalSpeed = 0;
+        // ctx.verticalSpeed = 0;
         ctx.animator.SetBool(AnimatorID.IsJumpingID, false);
         ctx.useRootMotion = true; //启用根运动
     }
 
-    public void OnFixedUpdate()
-    {
-    //    ctx.verticalSpeed += ctx.gravity*Time.fixedDeltaTime;
-        
-       
-    }
-
-    public void OnUpdate()
-    {
-
-    }
     #region Methods
     #endregion
 }

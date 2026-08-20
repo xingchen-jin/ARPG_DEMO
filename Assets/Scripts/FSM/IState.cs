@@ -10,7 +10,7 @@ namespace MyFSM{
         void OnUpdate();
         // void OnInput(PlayerInputData inputData);
         void OnFixedUpdate();
-        
+        void OnLateUpdate();
         // void OnCheck();
     }
 }
