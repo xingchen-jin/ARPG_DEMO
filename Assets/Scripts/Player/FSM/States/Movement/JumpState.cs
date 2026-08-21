@@ -15,6 +15,8 @@ public class JumpState : StateBase
     }
     public override void OnEnter()
     {
+        ctx.input.jumpInput = false; //重置跳跃输入，避免重复触发
+
         ctx.verticalSpeed = ctx.InitVerticalSpeed;
         ctx.animator.SetBool(AnimatorID.IsJumpingID, true);
         ctx.useRootMotion = false; //禁用根运动

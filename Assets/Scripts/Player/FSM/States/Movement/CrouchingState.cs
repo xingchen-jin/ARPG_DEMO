@@ -8,9 +8,18 @@ public class CrouchingState : StateBase
     PlayerFSMContext ctx;
     private float maxSpeed;
     Vector2 moveInput;
+    private float idleToMoveThreshold = 0.4f;//移动速度阈值，低于该值认为是静止状态，高于该值认为是移动状态
     private Vector3 originalControllerCenter;
     private float originalControllerHeight;
     private float originalControllerRadius;
+
+    private Vector3 idleControllerCenter;
+    private float idleControllerHeight;
+    private float idleControllerRadius;
+    private Vector3 movingControllerCenter;
+    private float movingControllerHeight;
+    private float movingControllerRadius;
+
     public CrouchingState(PlayerFSMContext ctx)
     {
         this.ctx = ctx;
@@ -21,16 +30,7 @@ public class CrouchingState : StateBase
         ctx.animator.SetBool(AnimatorID.IsCrouchingID, true);
         //设置最大速度为蹲下速度
         maxSpeed = ctx.CrouchSpeed;
-        //保存当前胶囊体高度和半径
-        originalControllerHeight = ctx.controller.height;
-        originalControllerCenter = ctx.controller.center;
-        originalControllerRadius = ctx.controller.radius;
-        //修改胶囊体高度为蹲下高度,刚开始时使用静止状态下的高度缩放倍数
-        ctx.controller.height = ctx.controller.height * ctx.crouchingHeightMult_Idle;
-        ctx.controller.center = new Vector3(ctx.controller.center.x, ctx.controller.center.y * ctx.crouchingHeightMult_Idle, ctx.controller.center.z);
-
-        //修改胶囊体半径
-        ctx.controller.radius = ctx.controller.radius * ctx.crouchingRadiusMult_Idle;
+        SetCrouchingControllerSize();
 
 
 
@@ -63,7 +63,43 @@ public class CrouchingState : StateBase
         ctx.targetSpeed = moveInput.magnitude*maxSpeed;
 
     }
+
+    public override void OnLateUpdate()
+    {
+        if(ctx.curSpeed > idleToMoveThreshold)
+        {
+            ctx.controller.height = movingControllerHeight;
+            ctx.controller.center = movingControllerCenter;
+            ctx.controller.radius = movingControllerRadius;
+        }else
+        {
+            ctx.controller.height = idleControllerHeight;
+            ctx.controller.center = idleControllerCenter;
+            ctx.controller.radius = idleControllerRadius;
+        }
+    }
+
     #region Methods
+    void SetCrouchingControllerSize()
+    {
+        //保存当前胶囊体高度和半径
+        originalControllerHeight = ctx.controller.height;
+        originalControllerCenter = ctx.controller.center;
+        originalControllerRadius = ctx.controller.radius;
+        //根据不同的移动状态设置胶囊体高度和半径
+        idleControllerCenter = new Vector3(ctx.controller.center.x, ctx.controller.center.y * ctx.crouchingHeightMult_Idle, ctx.controller.center.z);
+        idleControllerHeight = ctx.controller.height * ctx.crouchingHeightMult_Idle;
+        idleControllerRadius = ctx.controller.radius * ctx.crouchingRadiusMult_Idle;
+        movingControllerCenter = new Vector3(ctx.controller.center.x, ctx.controller.center.y * ctx.crouchingHeightMult_Fwd, ctx.controller.center.z);
+        movingControllerHeight = ctx.controller.height * ctx.crouchingHeightMult_Fwd;
+        movingControllerRadius = ctx.controller.radius * ctx.crouchingRadiusMult_Fwd;
+
+        //修改胶囊体高度
+        ctx.controller.height = idleControllerHeight;
+        ctx.controller.center = idleControllerCenter;
+        //修改胶囊体半径
+        ctx.controller.radius = idleControllerRadius;
+    }
      void Move()
     {
         ctx.curSpeed = Mathf.Lerp(ctx.curSpeed, ctx.targetSpeed, 3f * Time.fixedDeltaTime);

@@ -44,7 +44,8 @@ public class PlayerFSMContext : FSMContext
     // [HideInInspector]public bool isAiming;  //正在瞄准，区分于输入瞄准请求 
     [HideInInspector]public bool canRun;
     [HideInInspector]public bool canRoate;//TODO：判断是否可以旋转，后续如果考虑新加状态则废弃
-    [HideInInspector]public bool useRootMotion;
+    [HideInInspector]public bool useRootMotion;//是否使用根运动
+    [HideInInspector]public bool builtinRootMotion;//是否使用动画自带的根运动
 
     #endregion
 
@@ -67,6 +68,8 @@ public class PlayerFSMContext : FSMContext
     public GameObject weapon;
     public Transform headPivot;//头顶位置
 
+    public ClimbDetector climbDetector;//攀爬检测器
+
 
     #endregion
 
@@ -84,6 +87,7 @@ public class PlayerFSMContext : FSMContext
 
     #region 重力与跳跃系统
     [Header("重力与跳跃系统")]
+    public bool openGravity = true; //是否开启重力
     public float baseGravity = -9.81f; //初始速度
     public float jumpGravityMultiplier = 1.0f;//上升时重力倍数
     public float fallGravityMultiplier = 1.8f;//下降重力倍数
@@ -96,6 +100,14 @@ public class PlayerFSMContext : FSMContext
     public float InitVerticalSpeed{
         get { return initVerticalSpeed; }
     }
+    #endregion
+    #region 攀爬系统
+    [Header("攀爬系统")]
+    public ClimbType climbType;
+    public bool canClimb;
+    public Vector3 wallPoint;
+    public Vector3 wallNormal;
+
     #endregion
 
     #region 其他参数

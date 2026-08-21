@@ -4,7 +4,7 @@ using UnityEngine;
 
     public enum PlayerMovementState
     {
-        None,Locomotion,Jump,Die,Crouch
+        None,Locomotion,Jump,Die,Crouch,Climb
     }
 
     public enum PlayerWeaponState

@@ -22,7 +22,7 @@ public class WeaponFSM : MonoBehaviour
         fsm.AddTransition(PlayerWeaponState.Firearm, PlayerWeaponState.Base, () => !ctx.input.RifleInput);
         fsm.AddTransition(PlayerWeaponState.Firearm, PlayerWeaponState.Aiming, () => ctx.input.aimInput);
         fsm.AddTransition(PlayerWeaponState.Aiming, PlayerWeaponState.Firearm, () => !ctx.input.aimInput);
-
+        
     }
 
     public void Start()

@@ -16,7 +16,6 @@ public class AimTargetUpdater : MonoBehaviour
     }
 
 
-
     void LateUpdate()
     {
         Ray ray = new Ray(aimCamera.transform.position, aimCamera.transform.forward);

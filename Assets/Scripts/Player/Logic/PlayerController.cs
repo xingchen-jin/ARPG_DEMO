@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,10 +13,12 @@ public class PlayerController : MonoBehaviour
     CharacterController controller;
     private MovementFSM movementFSM;
     private WeaponFSM weaponFSM;
+    private ClimbDetector climbDetector;//攀爬检测器
+   
 
     public PlayerFSMContext ctx;
     #region 地面检测
-    private float groundCheckOffset;
+    [SerializeField]private float groundCheckOffset = 0.1f;
     
 
     #endregion
@@ -27,17 +30,18 @@ public class PlayerController : MonoBehaviour
         playerInputMap.Enable();
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
+        climbDetector = GetComponent<ClimbDetector>();
 
         ctx.controller = controller;
-
         //给FSMContext赋值
         ctx.animator = animator;
         ctx.playerTransform = transform;
         ctx.input = input;
         ctx.controller = controller;
-
+        ctx.climbDetector = climbDetector;
+        
         //地面检测
-        groundCheckOffset = controller.radius + 0.1f;//设置偏移量为胶囊体半径+0.1f，避免检测到自身
+        // groundCheckOffset = controller.radius + 0.1f;//设置偏移量为胶囊体半径+0.1f，避免检测到自身
 
     }
     void Start()
@@ -71,6 +75,8 @@ public class PlayerController : MonoBehaviour
         if (context.performed)
         {
             ctx.input.jumpInput = true;
+            ctx.input.crouchInput = false; //按下跳跃键时取消下蹲状态
+    
         }
     }
     public void OnFirearm(InputAction.CallbackContext context)
@@ -127,6 +133,11 @@ public class PlayerController : MonoBehaviour
     }
     void OnAnimatorMove()
     {
+        if(ctx.builtinRootMotion)
+        {
+            ctx.animator.ApplyBuiltinRootMotion();
+            return;
+        }
         // controller.SimpleMove(animator.velocity);
         if(!ctx.useRootMotion)
         {
@@ -134,7 +145,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-            controller.Move(animator.deltaPosition + new Vector3(0, ctx.verticalSpeed * Time.fixedDeltaTime, 0));
+            controller.Move(animator.deltaPosition+ new Vector3(0, ctx.verticalSpeed * Time.fixedDeltaTime, 0));
         }
         // controller.Move(animator.deltaPosition + new Vector3(0, ctx.verticalSpeed * Time.fixedDeltaTime, 0));
      
@@ -160,23 +171,23 @@ public class PlayerController : MonoBehaviour
     }
 
 
-     void OnAnimatorIK(int layerIndex)
-    {
+    //  void OnAnimatorIK(int layerIndex)
+    // {
        
-        animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
-        animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
-        animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
-        animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
+    //     animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
+    //     animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
+    //     animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
+    //     animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
+    //     animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
+    //     animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
+    //     animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
+    //     animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
 
-    }
+    // }
 
     bool CheckGrounded()
     {
-        if(Physics.SphereCast(transform.position + Vector3.up * groundCheckOffset, controller.radius, Vector3.down, out RaycastHit hit, groundCheckOffset-controller.radius + 2*controller.skinWidth))
+        if(Physics.SphereCast(transform.position + Vector3.up * (controller.radius + groundCheckOffset), controller.radius, Vector3.down, out RaycastHit hit, groundCheckOffset + 2*controller.skinWidth))
         {
             return true;
         }
@@ -190,12 +201,39 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     void Gravity()
     {
+        if (!ctx.openGravity) {
+            return;
+        }
         //TODO: 地面检测后续更改，重力效果也可以改
-        if (!controller.isGrounded)
+        if (!ctx.isGrounded)
         {
             float gravityMultiplier = ctx.verticalSpeed > 0 ? ctx.jumpGravityMultiplier : ctx.fallGravityMultiplier;
             ctx.verticalSpeed += ctx.baseGravity * gravityMultiplier * Time.fixedDeltaTime;
 
+        }else if(ctx.verticalSpeed < 0)
+        {
+            ctx.verticalSpeed = 0;
+        }
+    }
+
+    void checkedclimb()
+    {
+        // 检查是否可以攀爬
+        if (climbDetector.TryGetClimbInfo(out ClimbType climbType, out Vector3 wallPoint, out Vector3 wallNormal))
+        {
+            ctx.climbType = climbType;
+            ctx.canClimb = true;
+            ctx.wallPoint = wallPoint;
+            ctx.wallNormal = wallNormal;
+            Debug.Log("可以攀爬");
+        }
+        else
+        {
+            ctx.climbType = ClimbType.None;
+            ctx.canClimb = false;
+            ctx.wallPoint = Vector3.zero;
+            ctx.wallNormal = Vector3.zero;
+            Debug.Log("不可以攀爬");
         }
     }
 }

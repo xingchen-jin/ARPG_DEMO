@@ -41,6 +41,7 @@ public class LocomotionState : StateBase
 
     public override void OnUpdate()
     {
+        checkClimb();//检查是否可以攀爬
 
         PlayerInputData inputData = ctx.input;
         moveInput = inputData.moveInput;
@@ -48,7 +49,6 @@ public class LocomotionState : StateBase
         //根据输入值调整当前速度,手柄推动的幅度越大，速度越快
         ctx.targetSpeed = moveInput.magnitude*maxSpeed;
 
-        Debug.Log("targetSpeed "+ctx.targetSpeed);
     }
     #endregion
 
@@ -85,6 +85,26 @@ public class LocomotionState : StateBase
                 Quaternion targetRotation = Quaternion.LookRotation(moveDir);
                 ctx.playerTransform.rotation = Quaternion.Slerp(ctx.playerTransform.rotation, targetRotation, 6f * Time.fixedDeltaTime);
             }
+        }
+    }
+    void checkClimb()
+    {
+        // 检查是否可以攀爬
+        if (ctx.climbDetector.TryGetClimbInfo(out ClimbType climbType, out Vector3 wallPoint, out Vector3 wallNormal))
+        {
+            ctx.climbType = climbType;
+            ctx.canClimb = true;
+            ctx.wallPoint = wallPoint;
+            ctx.wallNormal = wallNormal;
+            Debug.Log("可以攀爬");
+        }
+        else
+        {
+            ctx.climbType = ClimbType.None;
+            ctx.canClimb = false;
+            ctx.wallPoint = Vector3.zero;
+            ctx.wallNormal = Vector3.zero;
+            Debug.Log("不可以攀爬");
         }
     }
 

@@ -119,9 +119,10 @@ public class WeaponAimingState : StateBase
             Bullet bullet = BulletPoolManager.Instance.GetBullet(BulletType.Rifle);
             Vector3 firePosition = ctx.firePoint.position;
             Vector3 targetPosition = CameraManager.Instance.AimTargetTransform.position;
+            // Vector3 targetPosition = GetAimTargetPosition();
             Vector3 fireDirection = (targetPosition - firePosition).normalized;
 
-            bullet.Init(firePosition, fireDirection, 20f);//TODO: 硬编码，后续可以考虑在武器数据中配置子弹速度
+            bullet.Init(firePosition, fireDirection, 40f);//TODO: 硬编码，后续可以考虑在武器数据中配置子弹速度
             SoundEffectPoolManager.Instance.OnPlayerSound(SoundEffectType.RifleFire, firePosition);
             //开火计时器
             gunTimer = FireInterval;
@@ -130,6 +131,7 @@ public class WeaponAimingState : StateBase
             gunTimer -= Time.deltaTime;
         }
     }
+
     #endregion
 
     
