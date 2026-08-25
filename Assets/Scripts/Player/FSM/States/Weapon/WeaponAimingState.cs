@@ -92,6 +92,11 @@ public class WeaponAimingState : StateBase
         else
             return ray.GetPoint(50f); // 未命中时取远处固定点
     }
+    
+    /// <summary>
+    /// 将玩家和瞄准点对齐到目标位置
+    /// </summary>
+    /// <param name="targetPosition"></param>
     private void AlignPlayerToTarget(Vector3 targetPosition)
     {
         Transform playerTransform = ctx.playerTransform;

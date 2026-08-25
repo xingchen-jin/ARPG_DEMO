@@ -101,10 +101,10 @@ public class WeaponController : MonoBehaviour
     /// <param name="weight"></param>
     public void SetLeftHandIKWeight(float weight)
     {
-        // if (leftHandIK != null)
-        // {
-        //     leftHandIK.weight = weight;
-        // }
+        if (leftHandIK != null)
+        {
+            leftHandIK.weight = weight;
+        }
     }
     /// <summary>
     /// 启用或禁用武器模型
