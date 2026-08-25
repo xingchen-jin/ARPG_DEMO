@@ -17,11 +17,11 @@ public class WeaponBaseState : StateBase
         ctx.animator.SetBool(AnimatorID.IsFirearmID, false);
         ctx.animator.SetBool(AnimatorID.IsAimingID, false);
         
-        ctx.leftHandIK.weight = 0;
+        ctx.weaponController.SetLeftHandIKWeight(0);
         ctx.rightHandIK.weight = 0;
 
         ctx.canRoate = true;
-        ctx.weapon.SetActive(false);
+        ctx.weaponController.EnableWeapon(false);
     }
 
 }

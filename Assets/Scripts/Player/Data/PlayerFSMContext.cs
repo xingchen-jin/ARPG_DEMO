@@ -46,9 +46,7 @@ public class PlayerFSMContext : FSMContext
     [HideInInspector]public bool canRoate;//TODO：判断是否可以旋转，后续如果考虑新加状态则废弃
     [HideInInspector]public bool useRootMotion;//是否使用根运动
     [HideInInspector]public bool builtinRootMotion;//是否使用动画自带的根运动
-
     #endregion
-
 
     #region 类型引用
     [Header("类型引用")]
@@ -60,15 +58,16 @@ public class PlayerFSMContext : FSMContext
     [HideInInspector]public CharacterController controller;
     [HideInInspector]public Animator animator;
     [HideInInspector]public Transform playerTransform;
-
-    public TwoBoneIKConstraint leftHandIK;
-    public TwoBoneIKConstraint rightHandIK;
+    [HideInInspector]public WeaponController weaponController; //武器控制器
+    // public GameObject weapon;       //标记武器对象位置
+    //[HideInInspector]public GameObject weaponModel; //实际武器实例
+    //public TwoBoneIKConstraint LeftHandIK;
+    public TwoBoneIKConstraint rightHandIK; //TODO:后续需要根据武器类型切换IK约束
     public MultiAimConstraint handAim;
     
-    public GameObject weapon;
     public Transform headPivot;//头顶位置
 
-    public ClimbDetector climbDetector;//攀爬检测器
+    [HideInInspector]public ClimbDetector climbDetector;//攀爬检测器
 
 
     #endregion
@@ -76,7 +75,8 @@ public class PlayerFSMContext : FSMContext
     #region 瞄准相关
     [Header("瞄准相关")]
     public Transform aimPivot;
-    public Transform firePoint;
+
+    //[HideInInspector]public Transform firePoint;
     // 瞄准时的俯仰角度
     public float aimPitchMin = -30f;
     public float aimPitchMax = 30f;

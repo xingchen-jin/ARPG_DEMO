@@ -62,7 +62,8 @@ public class ClimbDetector : MonoBehaviour
         float forwardOffset = forwardOffsetBase+controller.radius; //额外偏移一个半径
         Vector3 baseOrigin = transform.position + forward * forwardOffset;
 
-        float maxCheckHeight = controller.height * endHeightMult + minThroughHeight;   //最大检测高度，为墙体高度加上最小通过高度
+        float minStandHeight = controller.height+0.1f; //最小站立高度，低于这个高度无法攀爬
+        float maxCheckHeight = controller.height * endHeightMult + minStandHeight;   //最大检测高度，为墙体高度加上最小站立高度
         float lowClimbHeight = controller.height * lowClimbHeightMult;//低攀爬高度
         float minClimbHeight = controller.height * minClimbHeightMult; //最小攀爬高度
 
@@ -71,12 +72,10 @@ public class ClimbDetector : MonoBehaviour
         float highestHitRayY = 0;    //最高命中的高度
         RaycastHit highestHit = new RaycastHit();     //记录命中的信息 
 
-        //存储每个高度的检测结果
-        List<bool> hitFlags = new List<bool>();
         //空洞信息
         float holeStartHeight = -1;
         bool inHole = false;
-        bool canClimb = false;//是否可以攀爬
+        bool canVault = false; //是否可以翻越
 
         while(currentHeight <= maxCheckHeight+vertiicalStep)//防止错过最大值
         {
@@ -88,7 +87,6 @@ public class ClimbDetector : MonoBehaviour
                 hasHit = true;
                 highestHitRayY = currentHeight;//记录最高命中高度上一个高度，为了向下检测准确墙顶高度
                 highestHit = hitInfo;
-                hitFlags.Add(true);
                 wallNormal = hitInfo.normal;//记录墙面法线
                 //如果当前处于空洞中，则记录空洞结束高度
             }
@@ -104,63 +102,54 @@ public class ClimbDetector : MonoBehaviour
                     //洞口高度足够，说明存在可以攀爬的最小空间，可以攀爬，最高命中高度为上一次的命中高度
                     if (hasHit)
                     {
-                        canClimb = true;
-                        break;
+                        Vector3 wallTopCheckOrigin = Vector3.up * vertiicalStep +  highestHit.point ; //从空洞开始高度向下检测
+                        canVault = CheckVault(wallTopCheckOrigin,-wallNormal * maxVaultWidth, vertiicalStep*2, out RaycastHit vaultHit);
+                        if(canVault && vaultHit.point.y <= lowClimbHeight+transform.position.y)
+                        {
+                            //可以翻越
+                            climbType = ClimbType.Vault;
+                            wallPoint = vaultHit.point;
+                            return true;
+                        }
+                        if(currentHeight - holeStartHeight >= minStandHeight)
+                        {
+                            //洞口高度足够，说明存在可以攀爬的最小空间，可以攀爬，最高命中高度为上一次的命中高度
+                            if(vaultHit.point.y > lowClimbHeight+transform.position.y)
+                            {
+                                //如果墙顶高度大于低攀爬高度，则为高攀爬
+                                climbType = ClimbType.HighClimb;
+                            }
+                            else
+                            {
+                                //否则为低攀爬
+                                climbType = ClimbType.LowClimb;
+                            }
+                            wallPoint = vaultHit.point;
+                            return true;
+                        }
                     }
                 }     
-                hitFlags.Add(false);
                 inHole = true;
             }
-            currentHeight += vertiicalStep;
-            
+            currentHeight += vertiicalStep;   
         }
-
-        //若不能攀爬或者最高命中高度小于最小攀爬高度，则返回false
-        if (!canClimb || highestHitRayY < minClimbHeight)
-        {
-            return false;
-        }
-
-        //精确检测墙顶高度，从最高命中高度向下检测，找到墙顶的准确高度
-        float preciseWallTopHeight = highestHitRayY;    //记录墙顶高度
-        bool canVault = true; //是否可以翻越
-
-        //从空洞开始高度向下检测
-        Vector3 wallTopCheckOrigin = Vector3.up * (holeStartHeight-highestHit.point.y)+  highestHit.point ; //从空洞开始高度向下检测
-        Debug.DrawLine(wallTopCheckOrigin, wallTopCheckOrigin + Vector3.down * vertiicalStep*2, Color.yellow, 2f); //绘制墙顶点的调试线
-
-        if (Physics.Raycast(wallTopCheckOrigin+forward * maxVaultWidth, Vector3.down, out RaycastHit wallTopHit, vertiicalStep*2, climbableLayer))
-        {
-            
-            //如果检测到墙顶，则说明墙顶宽度大于最大翻越宽度，不能翻越
-            canVault = false;
-        }
-        if (Physics.Raycast(wallTopCheckOrigin +forward*0.05f+ Vector3.up * vertiicalStep, Vector3.down, out RaycastHit wallTopHit2, vertiicalStep*2, climbableLayer))
-        {
-            Debug.DrawLine(wallTopCheckOrigin + forward*0.05f+ Vector3.up * vertiicalStep, wallTopHit2.point, Color.green, 2f); //绘制墙顶点的调试线
-
-            preciseWallTopHeight = wallTopHit2.point.y;
-            wallPoint = wallTopHit2.point;
-        }
-        else
-        {
-            Debug.LogWarning("无法精确检测墙顶高度，使用最高命中高度作为墙顶高度");
-            wallPoint = highestHit.point;
-        }
-        // Debug.DrawLine(wallPoint, wallPoint + Vector3.up * 0.5f, Color.blue, 2f); //绘制墙顶点的调试线
-
-        //计算攀爬类型
-        if (preciseWallTopHeight - transform.position.y <= lowClimbHeight)
-        {
-            climbType = canVault ? ClimbType.Vault : ClimbType.LowClimb;
-
-        }
-        else
-        {
-            climbType = ClimbType.HighClimb;
-        }
-        
-        return true;
+        return false;
+    }
+    /// <summary>
+    /// 检查是否可以翻越
+    /// </summary>
+    /// <param name="CheckOrigin">起点</param>
+    /// <param name="forward">前进向量</param>
+    /// <param name="distance">向下检测距离</param>
+    /// <param name="hitInfo">返回检测信息</param>
+    /// <returns></returns>
+    bool CheckVault(Vector3 CheckOrigin, Vector3 forward, float distance,out RaycastHit hitInfo)
+    {
+        Debug.DrawLine(CheckOrigin, CheckOrigin+Vector3.down*distance, Color.blue, 0.1f); //绘制前检测线
+        Debug.DrawLine(CheckOrigin+forward, CheckOrigin+forward+Vector3.down*distance, Color.black, 0.1f);//绘制后检测线
+    //检查墙顶是否可以翻越
+      Physics.Raycast(CheckOrigin, Vector3.down, out hitInfo, distance, climbableLayer);
+      return !Physics.Raycast(CheckOrigin+forward,Vector3.down, distance, climbableLayer);  //检测墙顶前方是否为墙,如果有墙则不能翻越
     }
 
 

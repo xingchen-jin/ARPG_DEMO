@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Bullet : MonoBehaviour
 {
-    public BulletType bulletType;
+    public WeaponType weaponType;
     [SerializeField]
     private float lifeTime = 5f;
     private Rigidbody rb;
@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour
     {
         yield return new WaitForSeconds(lifeTime);
         //TODO: 回收对象到对象池
-        BulletPoolManager.Instance.ReleaseBullet(bulletType, this);
+        BulletPoolManager.Instance.ReleaseBullet(weaponType, this);
     }
 
 }

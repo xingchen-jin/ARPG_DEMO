@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     private MovementFSM movementFSM;
     private WeaponFSM weaponFSM;
     private ClimbDetector climbDetector;//攀爬检测器
+    private WeaponController weaponController;
    
 
     public PlayerFSMContext ctx;
@@ -31,7 +32,9 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
         climbDetector = GetComponent<ClimbDetector>();
+        weaponController = GetComponent<WeaponController>();
 
+        ctx.weaponController = weaponController;
         ctx.controller = controller;
         //给FSMContext赋值
         ctx.animator = animator;
@@ -44,11 +47,18 @@ public class PlayerController : MonoBehaviour
         // groundCheckOffset = controller.radius + 0.1f;//设置偏移量为胶囊体半径+0.1f，避免检测到自身
 
     }
-    void Start()
+
+     void Start()
     {
+        //初始化武器相关,根据实际武器调整初始值
+        // ctx.weaponModel = ctx.weapon.GetComponentInChildren<WeaponBehavior>().gameObject;
+        // WeaponBehavior firearm = ctx.weaponModel.GetComponent<WeaponBehavior>();
+        // ctx.firePoint = firearm.firePoint;
+        // ctx.leftHandIK.data.target = firearm.LeftHandIKTarget;
+
         ctx.verticalSpeed = 0;
         ctx.useRootMotion = true;
-        ctx.weapon.SetActive(false);
+        weaponController.EnableWeapon(false);
 
         //初始化状态机
         movementFSM = new MovementFSM(ctx);
@@ -62,8 +72,6 @@ public class PlayerController : MonoBehaviour
         animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
         animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
         animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
-
-        
     }
 
     #region InputSystem事件回调
@@ -79,11 +87,16 @@ public class PlayerController : MonoBehaviour
     
         }
     }
+    /// <summary>
+    /// 切换武器事件回调,目前只支持单一武器切换（空手/拿枪），后续可扩展为多武器切换
+    /// </summary>
+    /// <param name="context"></param>
     public void OnFirearm(InputAction.CallbackContext context)
     {
         if (context.performed)
         {
             ctx.input.RifleInput = animator.GetBool("isFirearm") ? false : true;
+            EventCenter.Instance.EventTrigger<WeaponType>(EventType.SwitchWeaponRequest, WeaponType.Rifle);//TODO:测试武器切换，后续需要扩展
         }
     }
     public void OnAim(InputAction.CallbackContext context)
@@ -170,20 +183,26 @@ public class PlayerController : MonoBehaviour
         playerInputMap.Disable();
     }
 
-
     //  void OnAnimatorIK(int layerIndex)
     // {
-       
-    //     animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, 1f);
-    //     animator.SetIKPositionWeight(AvatarIKGoal.RightHand, 1f);
+    //     //脚部IK
     //     animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
     //     animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
-    //     animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, 1f);
-    //     animator.SetIKRotationWeight(AvatarIKGoal.RightHand, 1f);
     //     animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
     //     animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
-
+    //
+    //     //手部IK：攀爬时关闭（ctx.handIKEnabled），避免与MatchTarget冲突
+    //     float handWeight = ctx.handIKEnabled ? 1f : 0f;
+    //     animator.SetIKPositionWeight(AvatarIKGoal.LeftHand, handWeight);
+    //     animator.SetIKPositionWeight(AvatarIKGoal.RightHand, handWeight);
+    //     animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, handWeight);
+    //     animator.SetIKRotationWeight(AvatarIKGoal.RightHand, handWeight);
     // }
+    private void OnSwitchWeapon()
+    {
+        
+    }
+
 
     bool CheckGrounded()
     {

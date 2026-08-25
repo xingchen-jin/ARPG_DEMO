@@ -35,7 +35,7 @@ public class WeaponAimingState : StateBase
        ctx.animator.SetBool(AnimatorID.IsFirearmID, false);
        ctx.animator.SetBool(AnimatorID.IsAimingID, true);
        //rigging
-        ctx.leftHandIK.weight = 1;
+        ctx.weaponController.SetLeftHandIKWeight(1.0f);
         ctx.rightHandIK.weight = 1;
         ctx.handAim.weight = 1;
 
@@ -44,9 +44,10 @@ public class WeaponAimingState : StateBase
 
         CameraManager.Instance.SwitchToAimCamera();
 
-        ctx.weapon.SetActive(true);
-    }
+        ctx.weaponController.EnableWeapon(true);
 
+    }
+    
     public override void OnExit()
     {
         ctx.animator.SetBool(AnimatorID.IsAimingID, false);
@@ -115,9 +116,27 @@ public class WeaponAimingState : StateBase
     {
         if (gunTimer <= 0f)
         {
+            // 防御：武器未装备时（开火点/子弹池不可用）直接跳过，避免空引用
+            Transform firePoint = ctx.weaponController.FirePoint;
+            if (firePoint == null)
+            {
+                gunTimer = FireInterval;
+                return;
+            }
+            if (BulletPoolManager.Instance == null)
+            {
+                gunTimer = FireInterval;
+                return;
+            }
+
             //获取子弹对象并初始化
-            Bullet bullet = BulletPoolManager.Instance.GetBullet(BulletType.Rifle);
-            Vector3 firePosition = ctx.firePoint.position;
+            Bullet bullet = BulletPoolManager.Instance.GetBullet(WeaponType.Rifle);
+            if (bullet == null)
+            {
+                gunTimer = FireInterval;
+                return;
+            }
+            Vector3 firePosition = firePoint.position;
             Vector3 targetPosition = CameraManager.Instance.AimTargetTransform.position;
             // Vector3 targetPosition = GetAimTargetPosition();
             Vector3 fireDirection = (targetPosition - firePosition).normalized;

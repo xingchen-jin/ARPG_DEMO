@@ -12,7 +12,7 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>
         {
             if (instance == null)
             {
-                instance = FindObjectOfType<T>();
+                instance = new GameObject(typeof(T).Name).AddComponent<T>();// 自动创建一个新的GameObject并添加T类型的组件
             }
             return instance;
         }
@@ -24,7 +24,7 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>
             return;
         }
         instance = (T)this;
-        //DontDestroyOnLoad(gameObject);// 保持单例对象在场景切换时不被销毁
+        DontDestroyOnLoad(gameObject);// 保持单例对象在场景切换时不被销毁
 
     }
     public static bool IsInstanceExists()

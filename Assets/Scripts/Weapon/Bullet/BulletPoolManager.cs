@@ -7,24 +7,24 @@ public class BulletPoolManager : Singleton<BulletPoolManager>
     [System.Serializable]
     public class BulletPoolConfig
     {
-        public BulletType bulletType;
+        public WeaponType weaponType;
         public GameObject bulletPrefab;
         public int maxSize = 100;    
         public int defaultCapacity = 30;
     }
     
     public List<BulletPoolConfig> bulletPoolConfigs;
-    private ObjectPoolManager<BulletType, Bullet> bulletPoolManager = new ObjectPoolManager<BulletType, Bullet>();
+    private ObjectPoolManager<WeaponType, Bullet> bulletPoolManager = new ObjectPoolManager<WeaponType, Bullet>();
     protected override void Awake()
     {
         base.Awake();
         foreach (var config in bulletPoolConfigs)
         {
             //设置父物体
-            Transform parent = new GameObject($"BulletPool_{config.bulletType}").transform;
+            Transform parent = new GameObject($"BulletPool_{config.weaponType}").transform;
             parent.SetParent(transform);
             //建池
-            bulletPoolManager.RegisterPool(config.bulletType, 
+            bulletPoolManager.RegisterPool(config.weaponType, 
             createFunc: () =>
             {
                 GameObject bulletObj = Instantiate(config.bulletPrefab, parent);
@@ -44,13 +44,13 @@ public class BulletPoolManager : Singleton<BulletPoolManager>
         }
     }
 
-    public Bullet GetBullet(BulletType bulletType)
+    public Bullet GetBullet(WeaponType weaponType)
     {
-        return bulletPoolManager.Get(bulletType);
+        return bulletPoolManager.Get(weaponType);
     }
-    public void ReleaseBullet(BulletType bulletType, Bullet bullet)
+    public void ReleaseBullet(WeaponType weaponType, Bullet bullet)
     {
-        bulletPoolManager.Release(bulletType, bullet);
+        bulletPoolManager.Release(weaponType, bullet);
     }
     
 }
