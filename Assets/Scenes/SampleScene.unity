@@ -3491,8 +3491,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 423805327}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.6800352, y: -0.6842813, z: -0.2546706, w: 0.06673831}
-  m_LocalPosition: {x: 0.088, y: 1.063, z: 0.111}
+  m_LocalRotation: {x: 0.44202098, y: -0.10166525, z: 0.07828451, w: 0.88777995}
+  m_LocalPosition: {x: 0.188, y: 1.1696804, z: 0.047}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -18916,7 +18916,7 @@ MonoBehaviour:
     animator: {fileID: 0}
     playerTransform: {fileID: 0}
     weaponController: {fileID: 0}
-    rightHandIK: {fileID: 1345265219}
+    rightHandIK: {fileID: 0}
     handAim: {fileID: 1107055229}
     headPivot: {fileID: 646610806}
     climbDetector: {fileID: 0}
@@ -19573,7 +19573,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: de735ef75fd9c6d45ad37ef91f25cd9b, type: 3}
   m_Controller: {fileID: 9100000, guid: c9c094ec6f52656478f0390c4eb41c10, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 1
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
@@ -19646,7 +19646,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponParent: {fileID: 776472405}
-  leftHandIK: {fileID: 1372351008}
+  leftHandIK: {fileID: 0}
 --- !u!4 &1705408608 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6673009254193180836, guid: de735ef75fd9c6d45ad37ef91f25cd9b,
