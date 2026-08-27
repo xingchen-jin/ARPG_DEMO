@@ -77,7 +77,12 @@ public class WeaponAimingState : StateBase
         if (ctx.input.fireInput)
         {
             Fire();
-
+            
+        }
+        if (ctx.input.reloadInput)
+        {
+            EventCenter.Instance.EventTrigger(EventType.ReloadRequest);
+            ctx.input.reloadInput = false; // 重置输入状态
         }
     }
 
@@ -133,7 +138,6 @@ public class WeaponAimingState : StateBase
                 gunTimer = FireInterval;
                 return;
             }
-
             //获取子弹对象并初始化
             Bullet bullet = BulletPoolManager.Instance.GetBullet(WeaponType.Rifle);
             if (bullet == null)
@@ -141,6 +145,10 @@ public class WeaponAimingState : StateBase
                 gunTimer = FireInterval;
                 return;
             }
+            //判断成功，可以开火
+            EventCenter.Instance.EventTrigger<int>(EventType.FireRequest, 1);
+
+
             Vector3 firePosition = firePoint.position;
             Vector3 targetPosition = CameraManager.Instance.AimTargetTransform.position;
             // Vector3 targetPosition = GetAimTargetPosition();

@@ -125,6 +125,13 @@ public class PlayerController : MonoBehaviour
                 break;
         }
     }
+    public void OnReload(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ctx.input.reloadInput = true;
+        }
+    }
 
     //TODO:待解决在跳跃等不应该触发下蹲的状态下，按下下蹲键会触发下蹲状态的问题
     public void OnCrouch(InputAction.CallbackContext context)

@@ -13,15 +13,16 @@ public enum EventType
     /// </summary>
     WeaponDataChanged,
     /// <summary>
-    /// 弹药数据改变事件,数据层完成切换后发布请求,<WeaponInstance>
+    /// 弹药数据改变事件,<int,int>  当前弹药数,总弹药数
     /// </summary>
     AmmoDataChanged, 
     /// <summary>
-    /// 换弹事件,<int,int>  当前弹药数,总弹药数
+    /// 换弹事件,
     /// </summary> 
-    ReloadWeapon,   //换弹事件
+    ReloadRequest,  
     /// <summary>
-    /// 开火事件
+    /// 开火事件    <int>子弹数
     /// </summary>
-    FireWeapon,     //开火事件
+    FireRequest,   
+
 }

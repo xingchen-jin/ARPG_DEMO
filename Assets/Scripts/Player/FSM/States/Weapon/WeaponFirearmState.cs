@@ -27,4 +27,14 @@ public class WeaponFirearmState : StateBase
         ctx.weaponController.EnableWeapon(true);
     }
 
+    public override void OnUpdate()
+    {
+        //处换弹
+        if (ctx.input.reloadInput)
+        {
+            EventCenter.Instance.EventTrigger(EventType.ReloadRequest);
+            ctx.input.reloadInput = false; // 重置输入状态
+        }
+    }
+
 }

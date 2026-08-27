@@ -8,10 +8,11 @@ public struct PlayerInputData
     public Vector2 lookInput;
     
     public bool jumpInput;
+    public bool crouchInput;
     public bool attackInput;
     public bool RifleInput;
     public bool aimInput;
     public bool fireInput;
-    public bool crouchInput;
+    public bool reloadInput;
 
 }

@@ -20,6 +20,37 @@ public class InventoryManager : Singleton<InventoryManager>
     void OnEnable()
     {
         EventCenter.Instance.AddListener<WeaponType>(EventType.SwitchWeaponRequest, OnSwitchWeaponRequest);
+        EventCenter.Instance.AddListener<int>(EventType.FireRequest, OnFireRequest);
+        EventCenter.Instance.AddListener(EventType.ReloadRequest, OnReloadRequest);
+    }
+    void OnDisable()
+    {
+        EventCenter.Instance.RemoveListener<WeaponType>(EventType.SwitchWeaponRequest, OnSwitchWeaponRequest);
+        EventCenter.Instance.RemoveListener<int>(EventType.FireRequest, OnFireRequest);
+        EventCenter.Instance.RemoveListener(EventType.ReloadRequest, OnReloadRequest);
+    }
+
+    private void OnReloadRequest()
+    {
+        if(ReloadCurrentWeapon())
+        {
+            //触发弹药数据改变事件，通知其他系统更新UI或进行其他操作
+            EventCenter.Instance.EventTrigger<int,int>(EventType.AmmoDataChanged, inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0);
+        }
+    }
+
+    private void OnFireRequest(int ammoCount)
+    {
+
+        // 处理开火请求
+        if (DeductAmmo(ammoCount))
+        {
+             //通知其他系统更新UI或进行其他操作
+            EventCenter.Instance.EventTrigger<int,int>(EventType.AmmoDataChanged, inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0);
+        }else
+        {
+            Debug.LogWarning("弹药不足，无法开火。");
+        }
     }
 
     private void OnSwitchWeaponRequest(WeaponType weaponType)
@@ -140,7 +171,7 @@ public class InventoryManager : Singleton<InventoryManager>
     /// <summary>
     /// 装填弹药给当前装备的武器
     /// </summary>
-    public void ReloadCurrentWeapon()
+    private bool ReloadCurrentWeapon()
     {
         InventoryWeaponSlotData currentWeaponSlot = inventoryData.CurrentWeaponSlotData;
         if (currentWeaponSlot != null && currentWeaponSlot.CurrentWeaponInstance != null)
@@ -151,8 +182,10 @@ public class InventoryManager : Singleton<InventoryManager>
                 int ammoToReload = Mathf.Min(ammoNeeded, currentWeaponSlot.AmmoTotal);
                 currentWeaponSlot.AddCurrentAmmo(ammoToReload);
                 currentWeaponSlot.RemoveAmmoTotal(ammoToReload);
+                return true;
             }
         }
+        return false;
     }
     /// <summary>
     /// 切换当前武器槽位
@@ -204,7 +237,7 @@ public class InventoryManager : Singleton<InventoryManager>
     /// 扣除当前装备武器的弹药
     /// </summary>
     /// <param name="amount"></param>
-    public bool DeductAmmo(int amount)
+    private bool DeductAmmo(int amount)
     {
         InventoryWeaponSlotData currentWeaponSlot = inventoryData.CurrentWeaponSlotData;
         if (currentWeaponSlot != null && currentWeaponSlot.CurrentWeaponInstance != null)

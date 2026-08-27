@@ -24,4 +24,8 @@ public class WeaponBaseState : StateBase
         ctx.weaponController.EnableWeapon(false);
     }
 
+    public override void OnUpdate()
+    {
+    }
+
 }
