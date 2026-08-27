@@ -9,11 +9,11 @@ public enum EventType
     /// </summary>
     SwitchWeaponRequest,
     /// <summary>
-    /// 切换武器（枪）事件,数据层完成切换后发布请求
+    /// 切换武器（枪）事件,数据层完成切换后发布请求,<WeaponType>
     /// </summary>
     WeaponDataChanged,
     /// <summary>
-    /// 换弹事件
+    /// 换弹事件,<WeaponInstance>
     /// </summary> 
     ReloadWeapon,   //换弹事件
     /// <summary>
