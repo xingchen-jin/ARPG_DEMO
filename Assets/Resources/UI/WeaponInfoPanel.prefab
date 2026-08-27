@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 294840802816883925}
   - component: {fileID: 1620481580526011766}
   m_Layer: 5
-  m_Name: ammoText
+  m_Name: AmmCountText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -263,7 +263,7 @@ GameObject:
   - component: {fileID: 666381201949900453}
   - component: {fileID: 2608611434830919935}
   m_Layer: 5
-  m_Name: Weapon
+  m_Name: WeaponIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

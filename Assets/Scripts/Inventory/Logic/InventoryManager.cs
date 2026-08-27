@@ -28,6 +28,7 @@ public class InventoryManager : Singleton<InventoryManager>
         inventoryData.SwitchWeaponSlot(weaponType);
         // 触发武器数据变更事件，通知其他系统更新UI或进行其他操作
         EventCenter.Instance.EventTrigger<WeaponInstance>(EventType.WeaponDataChanged, inventoryData.equippedWeapon);
+        EventCenter.Instance.EventTrigger<int,int>(EventType.AmmoDataChanged, inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0);
     }
     #region 一般物品管理
     /// <summary>

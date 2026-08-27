@@ -41,6 +41,7 @@ public class UIManager : BaseManager<UIManager>
 
     private void Init()
     {
+        Debug.Log("UIManager初始化");
         //动态创建唯一的Canvas和EventSystem（摄像机）
         //uiCamera = GameObject.Instantiate(ResManager.Instance.Load<GameObject>("UI/UICamera")).GetComponent<Camera>();
         //ui摄像机过场景不移除 专门用来渲染UI面板
@@ -129,7 +130,7 @@ public class UIManager : BaseManager<UIManager>
                 Debug.LogError($"面板{panelName}加载失败");
                 return;
             }
-            panelObj.transform.SetParent(GetLayerParent(level));
+            panelObj.transform.SetParent(GetLayerParent(level), false);
             T panel = panelObj.GetComponent<T>();
             if (panel == null)
             {
@@ -182,7 +183,7 @@ public class UIManager : BaseManager<UIManager>
             Debug.LogWarning($"面板{panelName}不存在，无法销毁");
         }
     }
-    
+
     /// <summary>
     /// 获取面板对象
     /// </summary>

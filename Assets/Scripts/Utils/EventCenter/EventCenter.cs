@@ -13,6 +13,15 @@ public class EventInfo<T> : EventInfoBase
         actions += action;
     }
 }
+public class EventInfo<T1,T2> : EventInfoBase
+{
+    public UnityAction<T1,T2> actions;
+
+    public EventInfo(UnityAction<T1,T2> action)
+    {
+        actions += action;
+    }
+}
 public class EventInfo : EventInfoBase
 {
     public UnityAction actions;
@@ -43,6 +52,15 @@ public class EventCenter : BaseManager<EventCenter>
             (eventDic[eventName] as EventInfo<T>).actions?.Invoke(info);
         }
     }
+    public void EventTrigger<T1,T2>(EventType eventName, T1 info1,T2 info2)
+    {
+        //存在关心我的人 才通知别人去处理逻辑
+        if (eventDic.ContainsKey(eventName))
+        {
+            //去执行对应的逻辑
+            (eventDic[eventName] as EventInfo<T1,T2>).actions?.Invoke(info1,info2);
+        }
+    }
     public void EventTrigger(EventType eventName)
     {
         //存在关心我的人 才通知别人去处理逻辑
@@ -70,6 +88,18 @@ public class EventCenter : BaseManager<EventCenter>
             (eventDic[eventName] as EventInfo<T>).actions += action;
         }
     }
+    public void AddListener<T1,T2>(EventType eventName, UnityAction<T1,T2> action)
+    {
+        //如果没有这个事件的监听者
+        if (!eventDic.ContainsKey(eventName))
+        {
+            eventDic.Add(eventName, new EventInfo<T1,T2>(action));
+        }
+        else
+        {
+            (eventDic[eventName] as EventInfo<T1,T2>).actions += action;
+        }
+    }
     public void AddListener(EventType eventName, UnityAction action)
     {
         //如果没有这个事件的监听者
@@ -93,6 +123,13 @@ public class EventCenter : BaseManager<EventCenter>
         if (eventDic.ContainsKey(eventName))
         {
             (eventDic[eventName] as EventInfo<T>).actions -= action;
+        }
+    }
+    public void RemoveListener<T1,T2>(EventType eventName, UnityAction<T1,T2> action)
+    {
+        if (eventDic.ContainsKey(eventName))
+        {
+            (eventDic[eventName] as EventInfo<T1,T2>).actions -= action;
         }
     }
     public void RemoveListener(EventType eventName, UnityAction action)

@@ -2,17 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStatusPanel : MonoBehaviour
+public class PlayerStatusPanel : UIBasePanel
 {
-    // Start is called before the first frame update
-    void Start()
+    public override void HideMe()
     {
-        
+   
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void ShowMe()
     {
-        
+      
     }
 }

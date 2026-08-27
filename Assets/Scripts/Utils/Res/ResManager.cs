@@ -9,6 +9,12 @@ public class ResManager : BaseManager<ResManager>
     {
         
     }
+    /// <summary>
+    /// 加载资源
+    /// </summary>
+    /// <typeparam name="T">资源类型</typeparam>
+    /// <param name="path">文件路径</param>
+    /// <returns></returns>
     public T Load<T>(string path) where T : Object
     {
         if (resDict.ContainsKey(path))
