@@ -19,35 +19,35 @@ public class WeaponInfoPanel : UIBasePanel
     void OnEnable()
     {
         //注册事件
-        EventCenter.Instance.AddListener<WeaponInstance>(EventType.WeaponDataChanged, OnWeaponDataChanged);
-        EventCenter.Instance.AddListener<int,int>(EventType.AmmoDataChanged, OnAmmoDataChanged);
+        EventCenter.Instance.AddListener<WeaponDataChangedEvent>(OnWeaponDataChanged);  
+        EventCenter.Instance.AddListener<AmmoDataChangedEvent>(OnAmmoDataChanged);
     }
     void OnDisable()
     {
         //注销事件
-        EventCenter.Instance.RemoveListener<WeaponInstance>(EventType.WeaponDataChanged, OnWeaponDataChanged);
-        EventCenter.Instance.RemoveListener<int,int>(EventType.AmmoDataChanged, OnAmmoDataChanged);
+        EventCenter.Instance.RemoveListener<WeaponDataChangedEvent>(OnWeaponDataChanged);
+        EventCenter.Instance.RemoveListener<AmmoDataChangedEvent>(OnAmmoDataChanged);
     }
 
-    private void OnAmmoDataChanged(int ammoCount,int ammoSum)
+    private void OnAmmoDataChanged(AmmoDataChangedEvent eventData)
     {
+        int ammoCount = eventData.currentAmmo;
+        int ammoSum = eventData.totalAmmo;
         //更新UI显示
         ammoCountText.text = ammoCount.ToString() + "/" + ammoSum.ToString();
 
     }
 
-    private void OnWeaponDataChanged(WeaponInstance weaponInstance)
+    private void OnWeaponDataChanged(WeaponDataChangedEvent eventData)
     {
         //更新UI显示
-        UpdateWeaponInfo(weaponInstance);
+        UpdateWeaponInfo(eventData.itemID);
     }
 
-    private void UpdateWeaponInfo(WeaponInstance weaponInstance)
+    private void UpdateWeaponInfo(int itemID)
     {
-        int itemID = weaponInstance.itemID;
         // 更新UI显示
         weaponIcon.sprite = ItemManager.Instance.GetItemBase(itemID).Icon;
-        //ammoCountText.text = 
     }
 
     public override void HideMe()

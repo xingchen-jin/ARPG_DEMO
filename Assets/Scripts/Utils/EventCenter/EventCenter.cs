@@ -1,73 +1,30 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-public abstract class EventInfoBase { }
-public class EventInfo<T> : EventInfoBase
-{
-    //真正观察者 对应的 函数信息 记录在其中
-    public UnityAction<T> actions;
-
-    public EventInfo(UnityAction<T> action)
-    {
-        actions += action;
-    }
-}
-public class EventInfo<T1,T2> : EventInfoBase
-{
-    public UnityAction<T1,T2> actions;
-
-    public EventInfo(UnityAction<T1,T2> action)
-    {
-        actions += action;
-    }
-}
-public class EventInfo : EventInfoBase
-{
-    public UnityAction actions;
-
-    public EventInfo(UnityAction action)
-    {
-        actions += action;
-    }
-}
 
 public class EventCenter : BaseManager<EventCenter>
 {
     //用于记录对应事件 关联的 对应的逻辑
-    private Dictionary<EventType, EventInfoBase> eventDic = new Dictionary<EventType, EventInfoBase>();
+    private Dictionary<Type,List<Delegate>> eventDic = new Dictionary<Type,List<Delegate>>();
 
     private EventCenter() { }
 
     /// <summary>
     /// 触发事件 
     /// </summary>
-    /// <param name="eventName">事件名字</param>
-    public void EventTrigger<T>(EventType eventName, T info)
+    /// <param name="eventName">事件数据</param>
+    public void EventTrigger<T>(T eventArgs) where T : IEvent
     {
         //存在关心我的人 才通知别人去处理逻辑
-        if (eventDic.ContainsKey(eventName))
+        if (eventDic.ContainsKey(typeof(T)))
         {
-            //去执行对应的逻辑
-            (eventDic[eventName] as EventInfo<T>).actions?.Invoke(info);
-        }
-    }
-    public void EventTrigger<T1,T2>(EventType eventName, T1 info1,T2 info2)
-    {
-        //存在关心我的人 才通知别人去处理逻辑
-        if (eventDic.ContainsKey(eventName))
-        {
-            //去执行对应的逻辑
-            (eventDic[eventName] as EventInfo<T1,T2>).actions?.Invoke(info1,info2);
-        }
-    }
-    public void EventTrigger(EventType eventName)
-    {
-        //存在关心我的人 才通知别人去处理逻辑
-        if (eventDic.ContainsKey(eventName))
-        {
-            //去执行对应的逻辑
-            (eventDic[eventName] as EventInfo).actions?.Invoke();
+            List<Delegate> delegateList = eventDic[typeof(T)];
+            foreach (var handler in delegateList)
+            {
+                ((Action<T>)handler)?.Invoke(eventArgs);
+            }
         }
     }
     /// <summary>
@@ -76,79 +33,40 @@ public class EventCenter : BaseManager<EventCenter>
     /// <typeparam name="T">传递的参数类型</typeparam>
     /// <param name="eventName">事件类型</param>
     /// <param name="action">监听的事件</param>
-    public void AddListener<T>(EventType eventName, UnityAction<T> action)
+    /// <returns></returns>
+    public void AddListener<T>(Action<T> handler) where T : IEvent
     {
-        //如果没有这个事件的监听者
-        if (!eventDic.ContainsKey(eventName))
+        var type = typeof(T);
+        if (!eventDic.TryGetValue(type, out List<Delegate> list))
         {
-            eventDic.Add(eventName, new EventInfo<T>(action));
+            list = new List<Delegate>();
+            eventDic[type] = list;
         }
-        else
-        {
-            (eventDic[eventName] as EventInfo<T>).actions += action;
-        }
+        list.Add(handler);
     }
-    public void AddListener<T1,T2>(EventType eventName, UnityAction<T1,T2> action)
-    {
-        //如果没有这个事件的监听者
-        if (!eventDic.ContainsKey(eventName))
-        {
-            eventDic.Add(eventName, new EventInfo<T1,T2>(action));
-        }
-        else
-        {
-            (eventDic[eventName] as EventInfo<T1,T2>).actions += action;
-        }
-    }
-    public void AddListener(EventType eventName, UnityAction action)
-    {
-        //如果没有这个事件的监听者
-        if (!eventDic.ContainsKey(eventName))
-        {
-            eventDic.Add(eventName, new EventInfo(action));
-        }
-        else
-        {
-            (eventDic[eventName] as EventInfo).actions += action;
-        }
-    }
+
     /// <summary>
     /// 移除事件监听者
     /// </summary>
-    /// <typeparam name="T">传递的参数类型</typeparam>
-    /// <param name="eventName">事件类型</param>
-    /// <param name="action">要移除的监听事件</param>
-    public void RemoveListener<T>(EventType eventName, UnityAction<T> action)
+    /// <typeparam name="T">事件类型</typeparam>
+    /// <param name="handler">要移除的监听事件</param>
+    public void RemoveListener<T>(Action<T> handler) where T : IEvent
     {
-        if (eventDic.ContainsKey(eventName))
+        if (eventDic.ContainsKey(typeof(T)))
         {
-            (eventDic[eventName] as EventInfo<T>).actions -= action;
-        }
-    }
-    public void RemoveListener<T1,T2>(EventType eventName, UnityAction<T1,T2> action)
-    {
-        if (eventDic.ContainsKey(eventName))
-        {
-            (eventDic[eventName] as EventInfo<T1,T2>).actions -= action;
-        }
-    }
-    public void RemoveListener(EventType eventName, UnityAction action)
-    {
-        if (eventDic.ContainsKey(eventName))
-        {
-            (eventDic[eventName] as EventInfo).actions -= action;
+            eventDic[typeof(T)].Remove(handler);
         }
     }
 
     /// <summary>
     /// 清空单一事件的所有监听
     /// </summary>
-    /// <param name="eventName"></param>
-    public void ClearListener(EventType eventName)
+    /// <typeparam name="T">事件数据包类型</typeparam>
+    public void ClearListener<T>()
     {
-        if (eventDic.ContainsKey(eventName))
+        if (eventDic.ContainsKey(typeof(T)))
         {
-            eventDic.Remove(eventName);
+            eventDic.Remove(typeof(T));
         }
     }
 

@@ -32,7 +32,7 @@ public class WeaponFirearmState : StateBase
         //处换弹
         if (ctx.input.reloadInput)
         {
-            EventCenter.Instance.EventTrigger(EventType.ReloadRequest);
+            EventCenter.Instance.EventTrigger<ReloadRequestEvent>(new ReloadRequestEvent());
             ctx.input.reloadInput = false; // 重置输入状态
         }
     }

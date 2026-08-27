@@ -19,19 +19,23 @@ public class WeaponController : MonoBehaviour
     #endregion
     void OnEnable()
     {
-        EventCenter.Instance.AddListener<WeaponInstance>(EventType.WeaponDataChanged, OnSwitchWeapon);
+        EventCenter.Instance.AddListener<WeaponDataChangedEvent>(OnSwitchWeapon);
     }
     void OnDisable()
     {
-        EventCenter.Instance.RemoveListener<WeaponInstance>(EventType.WeaponDataChanged, OnSwitchWeapon);
+        EventCenter.Instance.RemoveListener<WeaponDataChangedEvent>(OnSwitchWeapon);
     }
 
-    private void OnSwitchWeapon(WeaponInstance weaponInstance)
+    private void OnSwitchWeapon(WeaponDataChangedEvent weaponDataChangedEvent)
     {
-        if (weaponInstance != null)
+        int itemID = weaponDataChangedEvent.itemID;
+        if (itemID <= 0)
         {
-            EquipWeapon(weaponInstance.itemID);
+            Debug.LogWarning("武器ID异常传入");
+            return;
         }
+
+        EquipWeapon(itemID);
     }
     /// <summary>
     /// 装备武器

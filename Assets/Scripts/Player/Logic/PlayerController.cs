@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviour
         if (context.performed)
         {
             ctx.input.RifleInput = animator.GetBool("isFirearm") ? false : true;
-            EventCenter.Instance.EventTrigger<WeaponType>(EventType.SwitchWeaponRequest, WeaponType.Rifle);//TODO:测试武器切换，后续需要扩展
+            EventCenter.Instance.EventTrigger<SwitchWeaponEvent>( new SwitchWeaponEvent(WeaponType.Rifle));//TODO:测试武器切换，后续需要扩展
         }
     }
     public void OnAim(InputAction.CallbackContext context)

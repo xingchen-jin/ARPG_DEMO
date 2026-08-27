@@ -77,11 +77,11 @@ public class WeaponAimingState : StateBase
         if (ctx.input.fireInput)
         {
             Fire();
-            
+
         }
         if (ctx.input.reloadInput)
         {
-            EventCenter.Instance.EventTrigger(EventType.ReloadRequest);
+            EventCenter.Instance.EventTrigger<ReloadRequestEvent>(new ReloadRequestEvent());
             ctx.input.reloadInput = false; // 重置输入状态
         }
     }
@@ -146,7 +146,7 @@ public class WeaponAimingState : StateBase
                 return;
             }
             //判断成功，可以开火
-            EventCenter.Instance.EventTrigger<int>(EventType.FireRequest, 1);
+            EventCenter.Instance.EventTrigger<FireRequestEvent>(new FireRequestEvent(1));
 
 
             Vector3 firePosition = firePoint.position;

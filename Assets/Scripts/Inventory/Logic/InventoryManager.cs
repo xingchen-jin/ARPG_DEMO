@@ -19,47 +19,48 @@ public class InventoryManager : Singleton<InventoryManager>
     }
     void OnEnable()
     {
-        EventCenter.Instance.AddListener<WeaponType>(EventType.SwitchWeaponRequest, OnSwitchWeaponRequest);
-        EventCenter.Instance.AddListener<int>(EventType.FireRequest, OnFireRequest);
-        EventCenter.Instance.AddListener(EventType.ReloadRequest, OnReloadRequest);
+        EventCenter.Instance.AddListener<SwitchWeaponEvent>(OnSwitchWeaponRequest);
+        EventCenter.Instance.AddListener<FireRequestEvent>(OnFireRequest);
+        EventCenter.Instance.AddListener<ReloadRequestEvent>(OnReloadRequest);
     }
     void OnDisable()
     {
-        EventCenter.Instance.RemoveListener<WeaponType>(EventType.SwitchWeaponRequest, OnSwitchWeaponRequest);
-        EventCenter.Instance.RemoveListener<int>(EventType.FireRequest, OnFireRequest);
-        EventCenter.Instance.RemoveListener(EventType.ReloadRequest, OnReloadRequest);
+        EventCenter.Instance.RemoveListener<SwitchWeaponEvent>(OnSwitchWeaponRequest);
+        EventCenter.Instance.RemoveListener<FireRequestEvent>(OnFireRequest);
+        EventCenter.Instance.RemoveListener<ReloadRequestEvent>(OnReloadRequest);
     }
 
-    private void OnReloadRequest()
+    private void OnReloadRequest(ReloadRequestEvent reloadRequestEvent)
     {
         if(ReloadCurrentWeapon())
         {
             //触发弹药数据改变事件，通知其他系统更新UI或进行其他操作
-            EventCenter.Instance.EventTrigger<int,int>(EventType.AmmoDataChanged, inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0);
+            EventCenter.Instance.EventTrigger<AmmoDataChangedEvent>(new AmmoDataChangedEvent(inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0));
         }
     }
 
-    private void OnFireRequest(int ammoCount)
+    private void OnFireRequest(FireRequestEvent fireRequestEvent)
     {
-
+        int ammoCount = fireRequestEvent.needAmmo;
         // 处理开火请求
         if (DeductAmmo(ammoCount))
         {
              //通知其他系统更新UI或进行其他操作
-            EventCenter.Instance.EventTrigger<int,int>(EventType.AmmoDataChanged, inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0);
+            EventCenter.Instance.EventTrigger<AmmoDataChangedEvent>(new AmmoDataChangedEvent(inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0));
         }else
         {
             Debug.LogWarning("弹药不足，无法开火。");
         }
     }
 
-    private void OnSwitchWeaponRequest(WeaponType weaponType)
+    private void OnSwitchWeaponRequest(SwitchWeaponEvent switchWeaponEvent)
     {
+        WeaponType weaponType = switchWeaponEvent.weaponType;
         // 切换当前装备的武器槽位
         inventoryData.SwitchWeaponSlot(weaponType);
         // 触发武器数据变更事件，通知其他系统更新UI或进行其他操作
-        EventCenter.Instance.EventTrigger<WeaponInstance>(EventType.WeaponDataChanged, inventoryData.equippedWeapon);
-        EventCenter.Instance.EventTrigger<int,int>(EventType.AmmoDataChanged, inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0);
+        EventCenter.Instance.EventTrigger<WeaponDataChangedEvent>(new WeaponDataChangedEvent(inventoryData.equippedWeapon.itemID));
+        EventCenter.Instance.EventTrigger<AmmoDataChangedEvent>(new AmmoDataChangedEvent(inventoryData.CurrentWeaponSlotData?.CurrentAmmo ?? 0, inventoryData.CurrentWeaponSlotData?.AmmoTotal ?? 0));
     }
     #region 一般物品管理
     /// <summary>
