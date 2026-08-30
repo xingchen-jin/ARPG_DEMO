@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class ClimbState : StateBase
+public class ClimbState : StateBase <PlayerFSMContext>
 {
-    PlayerFSMContext ctx;
     Vector3 leftHandTargetPos;//左手目标位置
     Vector3 rightHandTargetPos;//右手目标位置
     Vector3 rightFootTargetPos;//右脚目标位置
@@ -14,10 +13,7 @@ public class ClimbState : StateBase
     bool lastBuiltinRootMotion;//记录上一次的动画自带根运动开关状态
     const float matchEndTime = 0.1f; //MatchTarget匹配窗口的结束时间（归一化时间）
     const float matchOffestHeight = 0.1f; //MatchTarget匹配目标位置的偏移距离
-    public ClimbState(PlayerFSMContext ctx)
-    {
-        this.ctx = ctx;     
-    }
+
     public override void OnEnter()
     {
         climbType = ctx.climbType;

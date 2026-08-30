@@ -19,11 +19,11 @@ public class WeaponController : MonoBehaviour
     #endregion
     void OnEnable()
     {
-        EventCenter.Instance.AddListener<WeaponDataChangedEvent>(OnSwitchWeapon);
+        EventCenter.AddListener<WeaponDataChangedEvent>(OnSwitchWeapon);
     }
     void OnDisable()
     {
-        EventCenter.Instance.RemoveListener<WeaponDataChangedEvent>(OnSwitchWeapon);
+        EventCenter.RemoveListener<WeaponDataChangedEvent>(OnSwitchWeapon);
     }
 
     private void OnSwitchWeapon(WeaponDataChangedEvent weaponDataChangedEvent)
@@ -31,7 +31,8 @@ public class WeaponController : MonoBehaviour
         int itemID = weaponDataChangedEvent.itemID;
         if (itemID <= 0)
         {
-            Debug.LogWarning("武器ID异常传入");
+            Debug.LogWarning("武器ID异常传入,显示空手");
+            UnequipWeapon();
             return;
         }
 

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class CrouchingState : StateBase
+public class CrouchingState : StateBase<PlayerFSMContext>
 {
-    PlayerFSMContext ctx;
     private float maxSpeed;
     Vector2 moveInput;
     private float idleToMoveThreshold = 0.4f;//移动速度阈值，低于该值认为是静止状态，高于该值认为是移动状态
@@ -20,10 +19,6 @@ public class CrouchingState : StateBase
     private float movingControllerHeight;
     private float movingControllerRadius;
 
-    public CrouchingState(PlayerFSMContext ctx)
-    {
-        this.ctx = ctx;
-    }
     public override void OnEnter()
     {
         //动画机

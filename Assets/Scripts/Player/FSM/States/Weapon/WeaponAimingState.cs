@@ -3,21 +3,18 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class WeaponAimingState : StateBase
-{
-    private PlayerFSMContext ctx;
-    
+public class WeaponAimingState : StateBase<PlayerFSMContext>
+{   
     private float roundsPerMinute = 600f; 
     private float FireInterval => 60f / roundsPerMinute; 
-    private float gunTimer = 0f; 
-
-    public WeaponAimingState(PlayerFSMContext ctx)
-    {
-        this.ctx = ctx;
-    }
+    private float gunTimer = 0f;
 
     public override void OnEnter()
     {
+        //设置动画参数
+       ctx.animator.SetBool(AnimatorID.IsFirearmID, false);
+       ctx.animator.SetBool(AnimatorID.IsAimingID, true);
+       
         //旋转到相机前方
         Camera cam = CameraManager.Instance.MainCamera;
         if(cam!=null)
@@ -32,8 +29,6 @@ public class WeaponAimingState : StateBase
             Debug.LogWarning("没有找到主相机，请确保场景中有一个标记为MainCamera的相机。");
         }
         
-       ctx.animator.SetBool(AnimatorID.IsFirearmID, false);
-       ctx.animator.SetBool(AnimatorID.IsAimingID, true);
        //rigging
         ctx.weaponController.SetLeftHandIKWeight(1.0f);
         ctx.rightHandIK.weight = 1;
@@ -50,7 +45,6 @@ public class WeaponAimingState : StateBase
     
     public override void OnExit()
     {
-        ctx.animator.SetBool(AnimatorID.IsAimingID, false);
         ctx.canRun = true;
         ctx.canRoate = true;
 
@@ -81,12 +75,12 @@ public class WeaponAimingState : StateBase
         }
         if (ctx.input.reloadInput)
         {
-            EventCenter.Instance.EventTrigger<ReloadRequestEvent>(new ReloadRequestEvent());
+            ctx.weaponFSM.SwitchState(PlayerWeaponState.Reload);
             ctx.input.reloadInput = false; // 重置输入状态
         }
     }
 
-    #region Methods
+    #region 私有方法
     private Vector3 GetAimTargetPosition()
     {
         Camera cam = Camera.main; // 当前自由视角相机
@@ -145,8 +139,24 @@ public class WeaponAimingState : StateBase
                 gunTimer = FireInterval;
                 return;
             }
-            //判断成功，可以开火
-            EventCenter.Instance.EventTrigger<FireRequestEvent>(new FireRequestEvent(1));
+
+            //开火数据处理
+            if(InventoryManager.Instance.DeductCurWeaponAmmo(1))
+            {
+                EventCenter.EventTrigger<AmmoDataChangedEvent>(new AmmoDataChangedEvent(InventoryManager.Instance.CurrentWeaponAmmo, InventoryManager.Instance.CurrentWeaponAmmoTotal));
+            }
+            else
+            {
+                //已经装填的弹药不足
+                // SoundEffectPoolManager.Instance.OnPlayerSound(SoundEffectType.EmptyGunClick, firePoint.position);
+                if(InventoryManager.Instance.CurrentWeaponAmmoTotal > 0)
+                {
+                    //弹药总数大于0，提示换弹，播放换弹动画
+                    ctx.weaponFSM.SwitchState(PlayerWeaponState.Reload);
+                }
+                gunTimer = FireInterval;
+                return;
+            }
 
 
             Vector3 firePosition = firePoint.position;
@@ -164,7 +174,7 @@ public class WeaponAimingState : StateBase
         }
     }
 
+
     #endregion
 
-    
 }

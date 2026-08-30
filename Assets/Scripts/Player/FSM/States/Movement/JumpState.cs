@@ -3,16 +3,10 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class JumpState : StateBase
+public class JumpState : StateBase<PlayerFSMContext>
 {
-    private PlayerFSMContext ctx;
     private Vector2 moveInput;
 
-    public JumpState(PlayerFSMContext ctx)
-    {
-        this.ctx = ctx;
-
-    }
     public override void OnEnter()
     {
         ctx.input.jumpInput = false; //重置跳跃输入，避免重复触发

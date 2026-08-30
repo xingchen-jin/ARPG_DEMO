@@ -41,7 +41,6 @@ public class UIManager : BaseManager<UIManager>
 
     private void Init()
     {
-        Debug.Log("UIManager初始化");
         //动态创建唯一的Canvas和EventSystem（摄像机）
         //uiCamera = GameObject.Instantiate(ResManager.Instance.Load<GameObject>("UI/UICamera")).GetComponent<Camera>();
         //ui摄像机过场景不移除 专门用来渲染UI面板
@@ -117,6 +116,7 @@ public class UIManager : BaseManager<UIManager>
         if(panelDic.ContainsKey(panelName))
         {
             //面板已经存在 直接显示
+            panelDic[panelName].ShowMe();
             panelDic[panelName].gameObject.SetActive(true);
             callback?.Invoke(panelDic[panelName] as T);
         }

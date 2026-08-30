@@ -4,18 +4,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class EventCenter : BaseManager<EventCenter>
+public static class EventCenter
 {
     //用于记录对应事件 关联的 对应的逻辑
-    private Dictionary<Type,List<Delegate>> eventDic = new Dictionary<Type,List<Delegate>>();
-
-    private EventCenter() { }
+    private static Dictionary<Type,List<Delegate>> eventDic = new Dictionary<Type,List<Delegate>>();
 
     /// <summary>
     /// 触发事件 
     /// </summary>
     /// <param name="eventName">事件数据</param>
-    public void EventTrigger<T>(T eventArgs) where T : IEvent
+    public static void EventTrigger<T>(T eventArgs) where T : IEvent
     {
         //存在关心我的人 才通知别人去处理逻辑
         if (eventDic.ContainsKey(typeof(T)))
@@ -34,7 +32,7 @@ public class EventCenter : BaseManager<EventCenter>
     /// <param name="eventName">事件类型</param>
     /// <param name="action">监听的事件</param>
     /// <returns></returns>
-    public void AddListener<T>(Action<T> handler) where T : IEvent
+    public static void AddListener<T>(Action<T> handler) where T : IEvent
     {
         var type = typeof(T);
         if (!eventDic.TryGetValue(type, out List<Delegate> list))
@@ -50,7 +48,7 @@ public class EventCenter : BaseManager<EventCenter>
     /// </summary>
     /// <typeparam name="T">事件类型</typeparam>
     /// <param name="handler">要移除的监听事件</param>
-    public void RemoveListener<T>(Action<T> handler) where T : IEvent
+    public static void RemoveListener<T>(Action<T> handler) where T : IEvent
     {
         if (eventDic.ContainsKey(typeof(T)))
         {
@@ -62,7 +60,7 @@ public class EventCenter : BaseManager<EventCenter>
     /// 清空单一事件的所有监听
     /// </summary>
     /// <typeparam name="T">事件数据包类型</typeparam>
-    public void ClearListener<T>()
+    public static void ClearListener<T>()
     {
         if (eventDic.ContainsKey(typeof(T)))
         {
@@ -73,7 +71,7 @@ public class EventCenter : BaseManager<EventCenter>
     /// <summary>
     /// 清空所有事件的监听
     /// </summary>
-    public void ClearAllEvent()
+    public static void ClearAllEvent()
     {
         eventDic.Clear();
     }

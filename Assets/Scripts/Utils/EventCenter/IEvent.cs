@@ -6,6 +6,9 @@ public interface IEvent
 {
 
 }
+/// <summary>
+/// 武器切换事件
+/// </summary>
 public struct SwitchWeaponEvent : IEvent
 {
     public WeaponType weaponType;
@@ -14,6 +17,9 @@ public struct SwitchWeaponEvent : IEvent
         this.weaponType = weaponType;
     }
 }
+/// <summary>
+/// 武器数据变化事件,id为-1表示武器被卸下
+/// </summary>
 public struct WeaponDataChangedEvent : IEvent
 {
     public int itemID;
@@ -22,6 +28,9 @@ public struct WeaponDataChangedEvent : IEvent
         this.itemID = itemID;
     }
 }
+/// <summary>
+/// 弹药数据变化事件，弹药为-1表示没有弹药
+/// </summary>
 public struct AmmoDataChangedEvent : IEvent
 {
     public int currentAmmo;
@@ -32,9 +41,9 @@ public struct AmmoDataChangedEvent : IEvent
         this.totalAmmo = totalAmmo;
     }
 }
-public class ReloadRequestEvent : IEvent
-{
-}
+/// <summary>
+/// 开火请求事件
+/// </summary>
 public struct FireRequestEvent : IEvent
 {
     public int needAmmo;

@@ -9,6 +9,7 @@ namespace MyFSM
     {
         public IState curState; //当前状态
         public TStateType curStateType; //当前状态枚举
+        public TStateType prevStateType; //上一个状态枚举
 
         public Dictionary<TStateType, IState> stateDict;    //存储状态机所有状态
         public Dictionary<TStateType,List<(TStateType,Func<bool> condition)>> stateTransitionDict; //存储状态机所有状态的转换关系,from为key
@@ -21,15 +22,15 @@ namespace MyFSM
             stateTransitionDict = new Dictionary<TStateType, List<(TStateType, Func<bool> condition)>>();
         }
 
-        public void AddState(TStateType type, IState state)
+        public void AddState(TStateType type, IState state,FSMContext context)
         {
-            if (!stateDict.ContainsKey(type))
+            if (stateDict.ContainsKey(type))
             {
-                stateDict.Add(type, state);
-            }else
-            {
-                Debug.LogError("状态已存在 " + type);
+                Debug.LogError("状态机已经存在该状态: " + type);
+                return;
             }
+            state.Initialization(context);
+            stateDict.Add(type, state);
         }
         public void AddTransition(TStateType from, TStateType to, Func<bool> condition)
         {
@@ -52,6 +53,7 @@ namespace MyFSM
                 curState.OnExit();
             }
             curState = stateDict[type];
+            prevStateType = curStateType;
             curStateType = type;
             curState.OnEnter();
         }

@@ -14,4 +14,5 @@ public static class AnimatorID
     public static readonly int IsJumpingID = Animator.StringToHash("isJumping");
     public static readonly int IsCrouchingID = Animator.StringToHash("isCrouching");
     public static readonly int ClimbTypeID = Animator.StringToHash("ClimbType");
+    public static readonly int ReloadTriggerID = Animator.StringToHash("ReloadTrigger");
 } 

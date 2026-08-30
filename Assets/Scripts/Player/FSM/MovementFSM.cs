@@ -13,10 +13,10 @@ public class MovementFSM
     {
         this.ctx = ctx;
         fsm = new FSM<PlayerMovementState>(ctx);
-        fsm.AddState(PlayerMovementState.Locomotion, new LocomotionState(ctx));
-        fsm.AddState(PlayerMovementState.Jump,new JumpState(ctx));
-        fsm.AddState(PlayerMovementState.Crouch,new CrouchingState(ctx));
-        fsm.AddState(PlayerMovementState.Climb,new ClimbState(ctx));
+        fsm.AddState(PlayerMovementState.Locomotion, new LocomotionState(),ctx);
+        fsm.AddState(PlayerMovementState.Jump,new JumpState(),ctx);
+        fsm.AddState(PlayerMovementState.Crouch,new CrouchingState(),ctx);
+        fsm.AddState(PlayerMovementState.Climb,new ClimbState(),ctx);
         //添加跳跃状态转换条件
         fsm.AddTransition(PlayerMovementState.Locomotion, PlayerMovementState.Jump, () => CanJump());
         fsm.AddTransition(PlayerMovementState.Locomotion, PlayerMovementState.Climb, () => CanClimb());
@@ -60,10 +60,18 @@ public class MovementFSM
         return ctx.animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f && ctx.animator.GetCurrentAnimatorStateInfo(0).IsTag("Climb");
     }
     #endregion
-
+    #region 动画事件转发处理
+    public void OnAnimEvent(string eventName)
+    {
+    }
+    #endregion
     public PlayerMovementState GetCurrentState()
     {
         return fsm.curStateType;
+    }
+    public PlayerMovementState GetPreviousState()
+    {
+        return fsm.prevStateType;
     }
     
 }

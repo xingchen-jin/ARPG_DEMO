@@ -23,7 +23,7 @@ public class CinemachineController : MonoBehaviour
         virtualCamera = GetComponent<CinemachineVirtualCamera>();
         framingTransposer = virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
 
-        framingTransposer.m_CameraDistance = defaultDistance;
+        framingTransposer.m_CameraDistance = defaultDistance;   //设置初始摄像机距离
         targetDistance = defaultDistance;
 
         playerInputMap = new PlayerInputMap();

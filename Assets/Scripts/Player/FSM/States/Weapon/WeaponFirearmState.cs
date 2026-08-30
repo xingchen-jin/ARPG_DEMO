@@ -3,15 +3,8 @@ using System.Collections.Generic;
 using MyFSM;
 using UnityEngine;
 
-public class WeaponFirearmState : StateBase
+public class WeaponFirearmState : StateBase<PlayerFSMContext>
 {
-    private PlayerFSMContext ctx;
-
-    public WeaponFirearmState(PlayerFSMContext ctx)
-    {
-        this.ctx = ctx;
-    }
-
     public override void OnEnter()
     {
        ctx.animator.SetBool(AnimatorID.IsFirearmID, true);
@@ -32,7 +25,7 @@ public class WeaponFirearmState : StateBase
         //处换弹
         if (ctx.input.reloadInput)
         {
-            EventCenter.Instance.EventTrigger<ReloadRequestEvent>(new ReloadRequestEvent());
+            ctx.weaponFSM.SwitchState(PlayerWeaponState.Reload);
             ctx.input.reloadInput = false; // 重置输入状态
         }
     }

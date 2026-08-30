@@ -21,3 +21,11 @@ MonoBehaviour:
     range: 100
     leftHandIKTarget: {fileID: 0}
     firePoint: {fileID: 0}
+  - itemID: 1002
+    weaponType: 0
+    magazineCapacity: 1
+    damage: 3
+    fireRate: 0
+    range: 0
+    leftHandIKTarget: {fileID: 0}
+    firePoint: {fileID: 0}

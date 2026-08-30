@@ -9,8 +9,9 @@ public class PlayerFSMContext : FSMContext
 {
     // [HideInInspector]public PlayerInputMap inputActions;
     #region 玩家基础参数
-    [SerializeField] private float walkSpeed;
-    [SerializeField] private float runSpeed;
+    [SerializeField] private float walkSpeedBase;
+    [SerializeField] private float runSpeedBase;
+    [HideInInspector] public float runSpeedActual; //当前奔跑速度，受瞄准状态影响
     [SerializeField] private float crouchSpeed;
 
     [HideInInspector]public float curSpeed; //速度的模值
@@ -25,11 +26,11 @@ public class PlayerFSMContext : FSMContext
 
 
 
-    public float WalkSpeed{
-        get { return walkSpeed; }
+    public float WalkSpeedBase{
+        get { return walkSpeedBase; }
     }
-    public float RunSpeed{
-        get { return runSpeed; }
+    public float RunSpeedBase{
+        get { return runSpeedBase; }
     }
     public float CrouchSpeed{
         get { return crouchSpeed; }
@@ -56,6 +57,10 @@ public class PlayerFSMContext : FSMContext
     #region 组件引用
     [Header("组件引用")]
     [HideInInspector]public CharacterController controller;
+    //状态机
+    [HideInInspector]public MovementFSM movementFSM;
+    [HideInInspector]public WeaponFSM weaponFSM;
+
     [HideInInspector]public Animator animator;
     [HideInInspector]public Transform playerTransform;
     [HideInInspector]public WeaponController weaponController; //武器控制器
@@ -121,5 +126,8 @@ public class PlayerFSMContext : FSMContext
     public float crouchingHeightMult_Idle = 0.75f; //下蹲时静止状态下的胶囊体高度缩放倍数
     public float crouchingRadiusMult_Idle = 1.74f; //下蹲时静止状态下的胶囊体半径缩放倍数
     #endregion
-    
+    // public PlayerFSMContext()
+    // {
+    //     runSpeedActual = runSpeedBase; //初始化当前奔跑速度为基础奔跑速度
+    // }
 }

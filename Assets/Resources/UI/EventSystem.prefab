@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1706133590252697897}
   - component: {fileID: 6662472818541508304}
-  - component: {fileID: 6248456622745032511}
+  - component: {fileID: -6480572509578965149}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
---- !u!114 &6248456622745032511
+--- !u!114 &-6480572509578965149
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -57,14 +57,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 3441094991937913165}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_SendPointerHoverToParent: 1
-  m_HorizontalAxis: Horizontal
-  m_VerticalAxis: Vertical
-  m_SubmitButton: Submit
-  m_CancelButton: Cancel
-  m_InputActionsPerSecond: 10
-  m_RepeatDelay: 0.5
-  m_ForceModuleActive: 0
+  m_MoveRepeatDelay: 0.5
+  m_MoveRepeatRate: 0.1
+  m_XRTrackingOrigin: {fileID: 0}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_PointAction: {fileID: -7744093446876950682, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_MoveAction: {fileID: -4293418372887766676, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_SubmitAction: {fileID: 8739975388288992469, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_CancelAction: {fileID: 5950722442375765224, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_LeftClickAction: {fileID: -1827567373691584284, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_MiddleClickAction: {fileID: -5860751818325188981, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_RightClickAction: {fileID: -7049140924321294384, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_ScrollWheelAction: {fileID: -2727017589294941677, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_TrackedDevicePositionAction: {fileID: -2081693146452260740, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7273764225881262893, guid: 303aaa7f1a45275498d713f8e3c53097,
+    type: 3}
+  m_DeselectOnBackgroundClick: 1
+  m_PointerBehavior: 0
+  m_CursorLockBehavior: 0
+  m_ScrollDeltaPerTick: 6

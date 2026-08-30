@@ -15,4 +15,6 @@ public struct PlayerInputData
     public bool fireInput;
     public bool reloadInput;
 
+    public bool radialMenuInput;
+
 }

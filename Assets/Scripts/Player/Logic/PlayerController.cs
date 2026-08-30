@@ -18,12 +18,11 @@ public class PlayerController : MonoBehaviour
    
 
     public PlayerFSMContext ctx;
-    #region 地面检测
+    [Header("地面检测")]
     [SerializeField]private float groundCheckOffset = 0.1f;
     
 
-    #endregion
-
+    #region Unity生命周期函数
     void Awake()
     {
         input = new PlayerInputData();
@@ -33,7 +32,8 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
         climbDetector = GetComponent<ClimbDetector>();
         weaponController = GetComponent<WeaponController>();
-
+        
+        ctx.runSpeedActual = ctx.RunSpeedBase; //初始化当前奔跑速度为基础奔跑速度
         ctx.weaponController = weaponController;
         ctx.controller = controller;
         //给FSMContext赋值
@@ -63,87 +63,18 @@ public class PlayerController : MonoBehaviour
         //初始化状态机
         movementFSM = new MovementFSM(ctx);
         movementFSM.Start();
+        ctx.movementFSM = movementFSM;
     
         weaponFSM = new WeaponFSM(ctx);
         weaponFSM.Start();
+        ctx.weaponFSM = weaponFSM;
 
         //IKGoal
-        animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
-        animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
-        animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
-        animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
+        // animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1f);
+        // animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1f);
+        // animator.SetIKRotationWeight(AvatarIKGoal.LeftFoot, 1f);
+        // animator.SetIKRotationWeight(AvatarIKGoal.RightFoot, 1f);
     }
-
-    #region InputSystem事件回调
-    public void OnMove(InputAction.CallbackContext context) {
-        ctx.input.moveInput = context.ReadValue<Vector2>();
-    }
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.jumpInput = true;
-            ctx.input.crouchInput = false; //按下跳跃键时取消下蹲状态
-    
-        }
-    }
-    /// <summary>
-    /// 切换武器事件回调,目前只支持单一武器切换（空手/拿枪），后续可扩展为多武器切换
-    /// </summary>
-    /// <param name="context"></param>
-    public void OnFirearm(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.RifleInput = animator.GetBool("isFirearm") ? false : true;
-            EventCenter.Instance.EventTrigger<SwitchWeaponEvent>( new SwitchWeaponEvent(WeaponType.Rifle));//TODO:测试武器切换，后续需要扩展
-        }
-    }
-    public void OnAim(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.aimInput = animator.GetBool("isAiming") ? false : true;
-        }
-    }
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        ctx.input.lookInput = context.ReadValue<Vector2>();
-    }
-    public void OnFire(InputAction.CallbackContext context)
-    {
-        switch (context.phase)
-        {
-            case InputActionPhase.Started:
-                ctx.input.fireInput = true;
-                break;
-            case InputActionPhase.Canceled:
-                ctx.input.fireInput = false;
-                break;
-            case InputActionPhase.Performed:
-                ctx.input.fireInput = true;
-                break;
-        }
-    }
-    public void OnReload(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.reloadInput = true;
-        }
-    }
-
-    //TODO:待解决在跳跃等不应该触发下蹲的状态下，按下下蹲键会触发下蹲状态的问题
-    public void OnCrouch(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.crouchInput = !ctx.input.crouchInput;
-        }
-    }
-    #endregion
-
-
     void Update()
     {
         movementFSM.OnUpdate();
@@ -189,7 +120,97 @@ public class PlayerController : MonoBehaviour
     {
         playerInputMap.Disable();
     }
+    #endregion
 
+    #region InputSystem事件回调
+    public void OnMove(InputAction.CallbackContext context) {
+        ctx.input.moveInput = context.ReadValue<Vector2>();
+    }
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ctx.input.jumpInput = true;
+            ctx.input.crouchInput = false; //按下跳跃键时取消下蹲状态
+    
+        }
+    }
+    /// <summary>
+    /// 切换武器事件回调,目前只支持单一武器切换（空手/拿枪），后续可扩展为多武器切换
+    /// </summary>
+    /// <param name="context"></param>
+    public void OnFirearm(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ctx.input.RifleInput = animator.GetBool("isFirearm") ? false : true;
+            EventCenter.EventTrigger<SwitchWeaponEvent>( new SwitchWeaponEvent(WeaponType.Rifle));//TODO:测试武器切换，后续需要扩展
+        }
+    }
+    public void OnAim(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ctx.input.aimInput = animator.GetBool("isAiming") ? false : true;
+        }
+    }
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        ctx.input.lookInput = context.ReadValue<Vector2>();
+    }
+    public void OnFire(InputAction.CallbackContext context)
+    {
+        switch (context.phase)
+        {
+            case InputActionPhase.Started:
+                ctx.input.fireInput = true;
+                break;
+            case InputActionPhase.Canceled:
+                ctx.input.fireInput = false;
+                break;
+            case InputActionPhase.Performed:
+                ctx.input.fireInput = true;
+                break;
+        }
+    }
+    public void OnReload(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ctx.input.reloadInput = true;
+        }
+    }
+
+    //TODO:待解决在跳跃等不应该触发下蹲的状态下，按下下蹲键会触发下蹲状态的问题
+    public void OnCrouch(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            ctx.input.crouchInput = !ctx.input.crouchInput;
+        }
+    }
+    public void OnRadialMenu(InputAction.CallbackContext context)
+    {
+        if (context.started && !ctx.input.radialMenuInput)
+        {
+            ctx.input.radialMenuInput = true;
+            UIManager.Instance.ShowPanel<RadialMenuPanel>(UILevel.Top);
+        }else if (context.started && ctx.input.radialMenuInput)
+        {
+            ctx.input.radialMenuInput = false;
+            UIManager.Instance.HidePanel<RadialMenuPanel>();
+        }
+    }
+    #endregion
+
+    #region 动画事件回调
+    public void OnAnimEvent(string eventName)
+    {
+        weaponFSM.OnAnimEvent(eventName);
+        movementFSM.OnAnimEvent(eventName);
+    }
+
+    #endregion
     //  void OnAnimatorIK(int layerIndex)
     // {
     //     //脚部IK

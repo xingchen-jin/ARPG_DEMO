@@ -8,23 +8,16 @@ using UnityEngine;
 /// <summary>
 /// 基础移动状态
 /// </summary>
-public class LocomotionState : StateBase
+public class LocomotionState : StateBase<PlayerFSMContext>
 {
-    private PlayerFSMContext ctx;
     private Vector2 moveInput;
     private float maxSpeed;
-    
-    public LocomotionState(PlayerFSMContext ctx)
-    {
-        this.ctx = ctx;
-
-    }
 
     #region IState
     public override void OnEnter()
     {
         // moveInput = Vector2.zero;//初始化移动输入为零，防止在进入移动状态时立即移动,这也导致进入移动状态至少隔离一帧才会移动
-        maxSpeed = ctx.RunSpeed;
+        maxSpeed = ctx.runSpeedActual;
     }
 
     public override void OnExit()
@@ -41,8 +34,11 @@ public class LocomotionState : StateBase
 
     public override void OnUpdate()
     {
-        checkClimb();//检查是否可以攀爬
-
+        //获取当前奔跑速度
+        maxSpeed = ctx.runSpeedActual;
+        //检查是否可以攀爬
+        checkClimb();
+        //输入处理
         PlayerInputData inputData = ctx.input;
         moveInput = inputData.moveInput;
         inputData.moveInput = Vector2.zero;//清空输入，防止重复读取
@@ -77,6 +73,7 @@ public class LocomotionState : StateBase
         
         //TODO:后续有合适动画改为根运动方式，现在就是屎
         if(ctx.canRoate){
+
             //移动反向
             Vector3 moveDir = (camForward*moveInput.y + camRight*moveInput.x).normalized;
             //旋转
