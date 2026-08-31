@@ -8,6 +8,10 @@ public class WeaponBaseState : StateBase<PlayerFSMContext>
 
     public override void OnEnter()
     {
+        //武器输入修改
+        ctx.input.RifleInput = false;
+        ctx.input.aimInput = false;
+        //武器动画修改
         ctx.animator.SetBool(AnimatorID.IsFirearmID, false);
         ctx.animator.SetBool(AnimatorID.IsAimingID, false);
         

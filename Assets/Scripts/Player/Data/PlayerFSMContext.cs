@@ -51,7 +51,7 @@ public class PlayerFSMContext : FSMContext
 
     #region 类型引用
     [Header("类型引用")]
-    [HideInInspector]public PlayerInputData input;
+    public PlayerInputData input;
     #endregion
 
     #region 组件引用

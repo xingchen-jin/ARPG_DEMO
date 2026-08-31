@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public abstract class UIBasePanel : MonoBehaviour
 {
+   public virtual bool BlocksPlayerInput => false;
    private Dictionary<string,UIBehaviour> controlDict = new Dictionary<string, UIBehaviour>();
    private List<string> defaultSelectedList = new List<string>()
    {

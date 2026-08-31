@@ -7134,6 +7134,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1690552502}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: de735ef75fd9c6d45ad37ef91f25cd9b,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1690552503}
     - targetCorrespondingSourceObject: {fileID: -372976506516359763, guid: de735ef75fd9c6d45ad37ef91f25cd9b,
         type: 3}
       insertIndex: -1
@@ -19029,7 +19033,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Actions: {fileID: -944628639613478452, guid: 303aaa7f1a45275498d713f8e3c53097,
     type: 3}
-  m_NotificationBehavior: 2
+  m_NotificationBehavior: 3
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
@@ -19750,6 +19754,62 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponParent: {fileID: 776472405}
   leftHandIK: {fileID: 1372351008}
+--- !u!114 &1690552503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1690552488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f258ce9436a08046abdffc9deb873a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentInputMode: 0
+  ctx:
+    walkSpeedBase: 0
+    runSpeedBase: 0
+    runSpeedActual: 0
+    crouchSpeed: 0
+    curSpeed: 0
+    targetSpeed: 0
+    canRun: 0
+    canRoate: 0
+    useRootMotion: 0
+    builtinRootMotion: 0
+    controller: {fileID: 0}
+    weaponFSM: {fileID: 0}
+    animator: {fileID: 0}
+    playerTransform: {fileID: 0}
+    weaponController: {fileID: 0}
+    rightHandIK: {fileID: 0}
+    handAim: {fileID: 0}
+    headPivot: {fileID: 0}
+    climbDetector: {fileID: 0}
+    aimPivot: {fileID: 0}
+    aimPitchMin: -30
+    aimPitchMax: 30
+    aimPitch: 0
+    mouseSensitivity: 2
+    openGravity: 1
+    baseGravity: -9.81
+    jumpGravityMultiplier: 1
+    fallGravityMultiplier: 1.8
+    jumpDispMultiplier: 1.2
+    verticalSpeed: 0
+    isGrounded: 0
+    initVerticalSpeed: 0
+    climbType: 0
+    canClimb: 0
+    wallPoint: {x: 0, y: 0, z: 0}
+    wallNormal: {x: 0, y: 0, z: 0}
+    groundCheckDistance: 0.1
+    planarDisplacement: {x: 0, y: 0, z: 0}
+    crouchingHeightMult_Fwd: 0.52
+    crouchingRadiusMult_Fwd: 1.74
+    crouchingHeightMult_Idle: 0.75
+    crouchingRadiusMult_Idle: 1.74
 --- !u!4 &1705408608 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -6673009254193180836, guid: de735ef75fd9c6d45ad37ef91f25cd9b,

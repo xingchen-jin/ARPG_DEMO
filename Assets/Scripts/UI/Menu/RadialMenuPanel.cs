@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class RadialMenuPanel : UIBasePanel
 {
+    public override bool BlocksPlayerInput => true;
     public readonly string PistolBtnName = "PistolBtn";
     public readonly string RifleBtnName = "RifleBtn";
     public readonly string ShotgunBtnName = "ShotgunBtn";
@@ -112,6 +113,8 @@ public class RadialMenuPanel : UIBasePanel
         }
         //发送事件
        EventCenter.EventTrigger<SwitchWeaponEvent>(new SwitchWeaponEvent(weaponType));
+       HideMe();
+       UIManager.Instance.HidePanel<RadialMenuPanel>();
     }
 
 }

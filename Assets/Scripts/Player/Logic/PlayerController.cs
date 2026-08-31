@@ -8,16 +8,15 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     PlayerInputData input;
-    PlayerInputMap playerInputMap;
     Animator animator;
     CharacterController controller;
     private MovementFSM movementFSM;
     private WeaponFSM weaponFSM;
     private ClimbDetector climbDetector;//攀爬检测器
     private WeaponController weaponController;
-   
+    private InputHandler inputHandler;
 
-    public PlayerFSMContext ctx;
+    [HideInInspector]public PlayerFSMContext ctx;
     [Header("地面检测")]
     [SerializeField]private float groundCheckOffset = 0.1f;
     
@@ -25,13 +24,11 @@ public class PlayerController : MonoBehaviour
     #region Unity生命周期函数
     void Awake()
     {
-        input = new PlayerInputData();
-        playerInputMap = new PlayerInputMap();
-        playerInputMap.Enable();
         animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
         climbDetector = GetComponent<ClimbDetector>();
         weaponController = GetComponent<WeaponController>();
+        inputHandler = GetComponent<InputHandler>();
         
         ctx.runSpeedActual = ctx.RunSpeedBase; //初始化当前奔跑速度为基础奔跑速度
         ctx.weaponController = weaponController;
@@ -39,16 +36,42 @@ public class PlayerController : MonoBehaviour
         //给FSMContext赋值
         ctx.animator = animator;
         ctx.playerTransform = transform;
-        ctx.input = input;
         ctx.controller = controller;
         ctx.climbDetector = climbDetector;
+        ctx.input = new PlayerInputData();
+
+        inputHandler.ctx = ctx; //将ctx传递给InputHandler
         
         //地面检测
         // groundCheckOffset = controller.radius + 0.1f;//设置偏移量为胶囊体半径+0.1f，避免检测到自身
 
     }
+    void OnEnable()
+    {
+        EventCenter.AddListener<SwitchWeaponEvent>(OnSwitchWeapon);
+    }
+    void OnDisable()
+    {
+        EventCenter.RemoveListener<SwitchWeaponEvent>(OnSwitchWeapon);
+    }
 
-     void Start()
+    private void OnSwitchWeapon(SwitchWeaponEvent @event)
+    {
+        Debug.Log($"切换武器事件触发，武器类型：{@event.weaponType}");
+        
+        switch (@event.weaponType)
+        {
+            case WeaponType.Melee:
+                ctx.input.RifleInput = false;
+                break;
+            default:
+                ctx.input.RifleInput = true;
+                break;
+        }
+        Debug.Log($"切换武器事件处理完成，RifleInput: {ctx.input.RifleInput}");
+    }
+
+    void Start()
     {
         //初始化武器相关,根据实际武器调整初始值
         // ctx.weaponModel = ctx.weapon.GetComponentInChildren<WeaponBehavior>().gameObject;
@@ -118,90 +141,11 @@ public class PlayerController : MonoBehaviour
     }
     private void OnDestroy()
     {
-        playerInputMap.Disable();
+        
     }
     #endregion
 
-    #region InputSystem事件回调
-    public void OnMove(InputAction.CallbackContext context) {
-        ctx.input.moveInput = context.ReadValue<Vector2>();
-    }
-    public void OnJump(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.jumpInput = true;
-            ctx.input.crouchInput = false; //按下跳跃键时取消下蹲状态
     
-        }
-    }
-    /// <summary>
-    /// 切换武器事件回调,目前只支持单一武器切换（空手/拿枪），后续可扩展为多武器切换
-    /// </summary>
-    /// <param name="context"></param>
-    public void OnFirearm(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.RifleInput = animator.GetBool("isFirearm") ? false : true;
-            EventCenter.EventTrigger<SwitchWeaponEvent>( new SwitchWeaponEvent(WeaponType.Rifle));//TODO:测试武器切换，后续需要扩展
-        }
-    }
-    public void OnAim(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.aimInput = animator.GetBool("isAiming") ? false : true;
-        }
-    }
-    public void OnLook(InputAction.CallbackContext context)
-    {
-        ctx.input.lookInput = context.ReadValue<Vector2>();
-    }
-    public void OnFire(InputAction.CallbackContext context)
-    {
-        switch (context.phase)
-        {
-            case InputActionPhase.Started:
-                ctx.input.fireInput = true;
-                break;
-            case InputActionPhase.Canceled:
-                ctx.input.fireInput = false;
-                break;
-            case InputActionPhase.Performed:
-                ctx.input.fireInput = true;
-                break;
-        }
-    }
-    public void OnReload(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.reloadInput = true;
-        }
-    }
-
-    //TODO:待解决在跳跃等不应该触发下蹲的状态下，按下下蹲键会触发下蹲状态的问题
-    public void OnCrouch(InputAction.CallbackContext context)
-    {
-        if (context.performed)
-        {
-            ctx.input.crouchInput = !ctx.input.crouchInput;
-        }
-    }
-    public void OnRadialMenu(InputAction.CallbackContext context)
-    {
-        if (context.started && !ctx.input.radialMenuInput)
-        {
-            ctx.input.radialMenuInput = true;
-            UIManager.Instance.ShowPanel<RadialMenuPanel>(UILevel.Top);
-        }else if (context.started && ctx.input.radialMenuInput)
-        {
-            ctx.input.radialMenuInput = false;
-            UIManager.Instance.HidePanel<RadialMenuPanel>();
-        }
-    }
-    #endregion
 
     #region 动画事件回调
     public void OnAnimEvent(string eventName)

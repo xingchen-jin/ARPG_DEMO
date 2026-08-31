@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public struct PlayerInputData
+[System.Serializable]
+public class PlayerInputData
 {
     public Vector2 moveInput;
     public Vector2 lookInput;

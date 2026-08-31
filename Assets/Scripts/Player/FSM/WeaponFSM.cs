@@ -24,7 +24,7 @@ public class WeaponFSM : MonoBehaviour
         fsm.AddTransition(PlayerWeaponState.Firearm, PlayerWeaponState.Base, () => !ctx.input.RifleInput);
         fsm.AddTransition(PlayerWeaponState.Firearm, PlayerWeaponState.Aiming, () => ctx.input.aimInput);
         fsm.AddTransition(PlayerWeaponState.Aiming, PlayerWeaponState.Firearm, () => !ctx.input.aimInput);
-        
+        fsm.AddTransition(PlayerWeaponState.Aiming,PlayerWeaponState.Base,()=>!ctx.input.RifleInput);
     }
 
     public void Start()
@@ -35,6 +35,7 @@ public class WeaponFSM : MonoBehaviour
     public void OnUpdate()
     {
         Debug.Log($"WeaponFSM当前状态:{fsm.curStateType}");
+        Debug.Log($"firearmInput:{ctx.input.RifleInput},aimInput:{ctx.input.aimInput}");
         fsm.OnUpdate();
     }
     public void OnFixedUpdate()=>fsm.OnFixedUpdate();
@@ -87,6 +88,7 @@ public class WeaponFSM : MonoBehaviour
                 Debug.LogWarning("在未设定的状态下播放了换弹动画");
                 break;
         }
+        
     }
     #endregion
 }
