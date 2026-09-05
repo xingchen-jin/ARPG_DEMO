@@ -45,6 +45,7 @@ public class PlayerFSMContext : FSMContext
     // [HideInInspector]public bool isAiming;  //正在瞄准，区分于输入瞄准请求 
     [HideInInspector]public bool canRun;
     [HideInInspector]public bool canRoate;//TODO：判断是否可以旋转，后续如果考虑新加状态则废弃
+    [HideInInspector]public bool canJump;
     [HideInInspector]public bool useRootMotion;//是否使用根运动
     [HideInInspector]public bool builtinRootMotion;//是否使用动画自带的根运动
     #endregion

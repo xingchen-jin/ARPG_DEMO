@@ -23,47 +23,68 @@ public class InputHandler : MonoBehaviour
     {
         playerInput.onActionTriggered += OnActionTriggered;
         SwitchInputMode(currentInputMode);
+
+        //注册事件
+        EventCenter.AddListener<SwitchInputModeEvent>(OnSwitchInputMode);
     }
     void OnDisable()
     {
         playerInput.onActionTriggered -= OnActionTriggered;
+        EventCenter.RemoveListener<SwitchInputModeEvent>(OnSwitchInputMode);
     }
+
+
 
 
     #region InputSystem事件回调
     private void OnActionTriggered(InputAction.CallbackContext context)
     {
-        Debug.Log($"输入事件触发，当前输入模式:{currentInputMode},触发的动作:{context.action.name},触发的阶段:{context.phase}");
-       switch (context.action.name)
+        if(currentInputMode == InputMode.UI)
         {
-            case "Move":
-                OnMove(context);
-                break;
-            case "Jump":
-                OnJump(context);
-                break;
-            case "Firearm":
-                OnFirearm(context);
-                break;
-            case "Aim":
-                OnAim(context);
-                break;
-            case "Look":
-                OnLook(context);
-                break;
-            case "Fire":
-                OnFire(context);
-                break;
-            case "Reload":
-                OnReload(context);
-                break;
-            case "Crouch":
-                OnCrouch(context);
-                break;
-            case "RadialMenu":
-                OnRadialMenu(context);
-                break;
+            switch (context.action.name)
+            {
+                case "OpenRadialMenu":
+                    OnRadialMenu(context);
+                    break;
+                default:
+                    return;
+            }
         }
+        else if(currentInputMode == InputMode.Gameplay)
+        {
+            switch (context.action.name)
+            {
+                case "Move":
+                    OnMove(context);
+                    break;
+                case "Jump":
+                    OnJump(context);
+                    break;
+                case "Firearm":
+                    OnFirearm(context);
+                    break;
+                case "Aim":
+                    OnAim(context);
+                    break;
+                case "Look":
+                    OnLook(context);
+                    break;
+                case "Fire":
+                    OnFire(context);
+                    break;
+                case "Reload":
+                    OnReload(context);
+                    break;
+                case "Crouch":
+                    OnCrouch(context);
+                    break;
+                case "OpenRadialMenu":
+                    OnRadialMenu(context);
+                    break;
+            }
+        }
+
+
     }
     public void OnMove(InputAction.CallbackContext context) 
     {
@@ -71,7 +92,7 @@ public class InputHandler : MonoBehaviour
     }
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.performed && ctx.canJump)
         {
             ctx.input.jumpInput = true;
             ctx.input.crouchInput = false; //按下跳跃键时取消下蹲状态
@@ -138,15 +159,21 @@ public class InputHandler : MonoBehaviour
         {
             ctx.input.radialMenuInput = true;
             UIManager.Instance.ShowPanel<RadialMenuPanel>(UILevel.Top);
-            SwitchInputMode(InputMode.UI);
         }else if (context.started && ctx.input.radialMenuInput)
         {
             ctx.input.radialMenuInput = false;
             UIManager.Instance.HidePanel<RadialMenuPanel>();
-            SwitchInputMode(InputMode.Gameplay);
         }
     }
     #endregion
+   
+    #region EventCenter事件回调
+    private void OnSwitchInputMode(SwitchInputModeEvent @event)
+    {
+        SwitchInputMode(@event.inputMode);
+    }
+    #endregion
+
     #region methods
     /// <summary>
     /// 切换输入模式
@@ -154,7 +181,6 @@ public class InputHandler : MonoBehaviour
     /// <param name="mode">输入模式</param>
     private void SwitchInputMode(InputMode mode)
     {
-        Debug.Log($"切换输入模式为:{mode}");
         currentInputMode = mode;
 
     }

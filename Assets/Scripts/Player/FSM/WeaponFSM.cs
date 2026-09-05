@@ -35,7 +35,7 @@ public class WeaponFSM : MonoBehaviour
     public void OnUpdate()
     {
         Debug.Log($"WeaponFSM当前状态:{fsm.curStateType}");
-        Debug.Log($"firearmInput:{ctx.input.RifleInput},aimInput:{ctx.input.aimInput}");
+        //Debug.Log($"firearmInput:{ctx.input.RifleInput},aimInput:{ctx.input.aimInput}");
         fsm.OnUpdate();
     }
     public void OnFixedUpdate()=>fsm.OnFixedUpdate();

@@ -10,7 +10,7 @@ public class JumpState : StateBase<PlayerFSMContext>
     public override void OnEnter()
     {
         ctx.input.jumpInput = false; //重置跳跃输入，避免重复触发
-
+        ctx.canJump = false; //进入跳跃状态后，禁止再次跳跃
         ctx.verticalSpeed = ctx.InitVerticalSpeed;
         ctx.animator.SetBool(AnimatorID.IsJumpingID, true);
         ctx.useRootMotion = false; //禁用根运动
@@ -21,9 +21,11 @@ public class JumpState : StateBase<PlayerFSMContext>
 
     public override void OnExit()
     {
+        ctx.canJump = true; //退出跳跃状态后，允许再次跳跃
         // ctx.verticalSpeed = 0;
         ctx.animator.SetBool(AnimatorID.IsJumpingID, false);
         ctx.useRootMotion = true; //启用根运动
+        
     }
 
     #region Methods

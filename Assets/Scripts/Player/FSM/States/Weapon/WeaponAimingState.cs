@@ -120,7 +120,22 @@ public class WeaponAimingState : StateBase<PlayerFSMContext>
     {
         if (gunTimer <= 0f)
         {
-            // 防御：武器未装备时（开火点/子弹池不可用）直接跳过，避免空引用
+            // 检查是否有可用的弹药
+            if(!InventoryManager.Instance.DeductCurWeaponAmmo(1))
+            {
+
+                //已经装填的弹药不足
+                // SoundEffectPoolManager.Instance.OnPlayerSound(SoundEffectType.EmptyGunClick, firePoint.position);
+                if(InventoryManager.Instance.CurrentWeaponAmmoTotal > 0)
+                {
+                    //弹药总数大于0，提示换弹，播放换弹动画
+                    ctx.weaponFSM.SwitchState(PlayerWeaponState.Reload);
+                }
+                gunTimer = FireInterval;
+                return;
+            }
+        
+            //武器未装备时（开火点/子弹池不可用）直接跳过，避免空引用
             Transform firePoint = ctx.weaponController.FirePoint;
             if (firePoint == null)
             {
@@ -139,26 +154,7 @@ public class WeaponAimingState : StateBase<PlayerFSMContext>
                 gunTimer = FireInterval;
                 return;
             }
-
-            //开火数据处理
-            if(InventoryManager.Instance.DeductCurWeaponAmmo(1))
-            {
-                EventCenter.EventTrigger<AmmoDataChangedEvent>(new AmmoDataChangedEvent(InventoryManager.Instance.CurrentWeaponAmmo, InventoryManager.Instance.CurrentWeaponAmmoTotal));
-            }
-            else
-            {
-                //已经装填的弹药不足
-                // SoundEffectPoolManager.Instance.OnPlayerSound(SoundEffectType.EmptyGunClick, firePoint.position);
-                if(InventoryManager.Instance.CurrentWeaponAmmoTotal > 0)
-                {
-                    //弹药总数大于0，提示换弹，播放换弹动画
-                    ctx.weaponFSM.SwitchState(PlayerWeaponState.Reload);
-                }
-                gunTimer = FireInterval;
-                return;
-            }
-
-
+            EventCenter.EventTrigger<AmmoDataChangedEvent>(new AmmoDataChangedEvent(InventoryManager.Instance.CurrentWeaponAmmo, InventoryManager.Instance.CurrentWeaponAmmoTotal));
             Vector3 firePosition = firePoint.position;
             Vector3 targetPosition = CameraManager.Instance.AimTargetTransform.position;
             // Vector3 targetPosition = GetAimTargetPosition();

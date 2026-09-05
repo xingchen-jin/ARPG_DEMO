@@ -31,6 +31,7 @@ public class RadialMenuPanel : UIBasePanel
     {
         this.gameObject.SetActive(false);
         CameraManager.Instance.HideCursorAndLock();
+        EventCenter.EventTrigger<SwitchInputModeEvent>(new SwitchInputModeEvent(InputMode.Gameplay));
     }
 
     public override void ShowMe()
@@ -38,6 +39,7 @@ public class RadialMenuPanel : UIBasePanel
         this.gameObject.SetActive(true);
         ShowAllWeaponInfo();
         CameraManager.Instance.ShowCursorAndUnlock();
+        EventCenter.EventTrigger<SwitchInputModeEvent>(new SwitchInputModeEvent(InputMode.UI));
     }
     /// <summary>
     /// 显示所有按钮的武器信息

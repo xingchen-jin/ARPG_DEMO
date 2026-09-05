@@ -39,7 +39,8 @@ public class PlayerController : MonoBehaviour
         ctx.controller = controller;
         ctx.climbDetector = climbDetector;
         ctx.input = new PlayerInputData();
-
+        
+        ctx.canJump = true;
         inputHandler.ctx = ctx; //将ctx传递给InputHandler
         
         //地面检测
@@ -68,7 +69,7 @@ public class PlayerController : MonoBehaviour
                 ctx.input.RifleInput = true;
                 break;
         }
-        Debug.Log($"切换武器事件处理完成，RifleInput: {ctx.input.RifleInput}");
+//        Debug.Log($"切换武器事件处理完成，RifleInput: {ctx.input.RifleInput}");
     }
 
     void Start()
@@ -127,7 +128,7 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         ctx.isGrounded = CheckGrounded();
-        Debug.Log("是否在地面上: " + ctx.isGrounded);
+//        Debug.Log("是否在地面上: " + ctx.isGrounded);
         Gravity();
         animator.SetFloat(AnimatorID.VerticalSpeedID, ctx.verticalSpeed);
 

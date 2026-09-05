@@ -23,7 +23,7 @@ public class ClimbState : StateBase <PlayerFSMContext>
         ctx.builtinRootMotion = true; //启用动画自带的根运动
 
         ctx.animator.SetInteger(AnimatorID.ClimbTypeID, (int)climbType);
-        Debug.Log("进入攀爬状态，攀爬类型：" + climbType);
+//        Debug.Log("进入攀爬状态，攀爬类型：" + climbType);
 
         ctx.input.jumpInput = false; //重置跳跃输入，避免重复触发
         ctx.playerTransform.rotation = Quaternion.Lerp(ctx.playerTransform.rotation, Quaternion.LookRotation(-ctx.wallNormal), 0.5f); //旋转角色面向墙面
@@ -86,8 +86,8 @@ public class ClimbState : StateBase <PlayerFSMContext>
             if(ctx.animator.GetCurrentAnimatorStateInfo(0).normalizedTime <= 0.45f)
                 ctx.animator.MatchTarget(rightHandTargetPos+Vector3.up*0.1f, Quaternion.identity, AvatarTarget.RightHand, new MatchTargetWeightMask(Vector3.one, 0f), 0.35f,0.45f ); //匹配左手位置，延迟0.2秒开始匹配
         }
-        Debug.Log(ctx.animator.isMatchingTarget);//检查是否正在匹配目标
-        Debug.Log(ctx.animator.IsInTransition(0));//检查是否正在过渡
+        // Debug.Log(ctx.animator.isMatchingTarget);//检查是否正在匹配目标
+        // Debug.Log(ctx.animator.IsInTransition(0));//检查是否正在过渡
         //Debug.DrawLine(ctx.wallPoint, leftHandTargetPos, Color.green, 2f); //绘制左手目标位置的调试线
     }
 

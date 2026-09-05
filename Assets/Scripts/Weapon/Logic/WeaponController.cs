@@ -10,6 +10,8 @@ public class WeaponController : MonoBehaviour
     [Header("组件引用")]
     [SerializeField] private Transform weaponParent; //武器挂载点
     [SerializeField] private TwoBoneIKConstraint leftHandIK; //左手IK约束
+    [SerializeField] private Transform leftHandIKTarget; //左手IK目标点
+    [SerializeField] private RigBuilder rigBuilder; //RigBuilder组件引用
 
     public Transform LeftHandIKTarget => leftHandIK != null ? leftHandIK.data.target : null;
     public Transform FirePoint => currentWeaponBehavior != null ? currentWeaponBehavior.firePoint : null;
@@ -25,7 +27,10 @@ public class WeaponController : MonoBehaviour
     {
         EventCenter.RemoveListener<WeaponDataChangedEvent>(OnSwitchWeapon);
     }
-
+    void Update()
+    {
+//        Debug.Log(leftHandIK.data.target);
+    }
     private void OnSwitchWeapon(WeaponDataChangedEvent weaponDataChangedEvent)
     {
         int itemID = weaponDataChangedEvent.itemID;
@@ -62,6 +67,8 @@ public class WeaponController : MonoBehaviour
                 if (currentWeaponBehavior != null && currentWeaponBehavior.LeftHandIKTarget != null)
                 {
                     leftHandIK.data.target = currentWeaponBehavior.LeftHandIKTarget;
+                    leftHandIK.weight = 1f; // 确保左手IK权重为1
+                    rigBuilder.Build(); // 强制刷新RigBuilder，确保IK约束立即生效
                 }
                 else
                 {
@@ -109,6 +116,9 @@ public class WeaponController : MonoBehaviour
         if (leftHandIK != null)
         {
             leftHandIK.weight = weight;
+            leftHandIK.data.targetPositionWeight = weight;
+            leftHandIK.data.targetRotationWeight = weight;
+            leftHandIK.data.GetHashCode(); // 强制刷新IK约束数据，确保权重变化立即生效
         }
     }
     /// <summary>

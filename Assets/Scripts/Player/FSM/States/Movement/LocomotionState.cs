@@ -93,7 +93,7 @@ public class LocomotionState : StateBase<PlayerFSMContext>
             ctx.canClimb = true;
             ctx.wallPoint = wallPoint;
             ctx.wallNormal = wallNormal;
-            Debug.Log("可以攀爬");
+//            Debug.Log("可以攀爬");
         }
         else
         {
@@ -101,7 +101,7 @@ public class LocomotionState : StateBase<PlayerFSMContext>
             ctx.canClimb = false;
             ctx.wallPoint = Vector3.zero;
             ctx.wallNormal = Vector3.zero;
-            Debug.Log("不可以攀爬");
+//            Debug.Log("不可以攀爬");
         }
     }
 

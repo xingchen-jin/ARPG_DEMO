@@ -112,26 +112,26 @@ public class UIManager : BaseManager<UIManager>
     {
         //获取面板名 预设体名必须和面板类名一致 
         string panelName = typeof(T).Name;
+        UIBasePanel panel;
         //加载面板预设体
-        if(panelDic.ContainsKey(panelName))
+        if(panelDic.TryGetValue(panelName, out panel))
         {
             //面板已经存在 直接显示
-            panelDic[panelName].ShowMe();
-            panelDic[panelName].gameObject.SetActive(true);
-            callback?.Invoke(panelDic[panelName] as T);
+            panel.ShowMe();
+            panel.gameObject.SetActive(true);
+            callback?.Invoke(panel as T);
         }
         else
         {
             //面板不存在 需要加载
             //TODO: 这里可以使用异步加载的方式
-            GameObject panelObj = GameObject.Instantiate(ResManager.Instance.Load<GameObject>($"{uiPath}{panelName}"));
+            GameObject panelObj = GameObject.Instantiate(ResManager.Instance.Load<GameObject>($"{uiPath}{panelName}"), GetLayerParent(level), false);
             if (panelObj == null)
             {
                 Debug.LogError($"面板{panelName}加载失败");
                 return;
             }
-            panelObj.transform.SetParent(GetLayerParent(level), false);
-            T panel = panelObj.GetComponent<T>();
+            panel = panelObj.GetComponent<T>();
             if (panel == null)
             {
                 Debug.LogError($"面板{panelName}上没有挂载{typeof(T)}组件");
@@ -140,10 +140,18 @@ public class UIManager : BaseManager<UIManager>
             //面板显示时会调用一次默认的显示逻辑
             panel.ShowMe();
             //执行回调
-            callback?.Invoke(panel);
+            callback?.Invoke(panel as T);
             //存储到字典中
             panelDic.Add(panelName, panel);
         }
+            // if (panel != null)
+            // {
+            //     if (panel.BlocksPlayerInput)
+            //     {
+            //         EventCenter.EventTrigger<SwitchInputModeEvent>(new SwitchInputModeEvent(InputMode.UI));
+            //     }
+            // }
+    
     }
     /// <summary>
     /// 关闭面板

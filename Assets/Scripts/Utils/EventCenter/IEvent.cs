@@ -52,3 +52,12 @@ public struct FireRequestEvent : IEvent
         this.needAmmo = currentAmmo;
     }
 }
+
+public struct SwitchInputModeEvent : IEvent
+{
+    public InputMode inputMode;
+    public SwitchInputModeEvent(InputMode inputMode)
+    {
+        this.inputMode = inputMode;
+    }
+}
