@@ -15,15 +15,15 @@ MonoBehaviour:
   enemies:
   - npcID: 1001
     npcName: "\u6DF1\u6E0A\u4EBA\u5F62\u9B54\u7269"
-    npcPrefab: {fileID: 919132149155446097, guid: e18d1711314745e4f9d973c5b189f96e,
+    npcPrefab: {fileID: 8371692083697577207, guid: a109557cf2f2d9b41baa13a276a54a4a,
       type: 3}
-    maxHealth: 50
+    maxHealth: 100
     currentHealth: 0
-    moveSpeed: 2
+    moveSpeed: 5
     rotationSpeed: 3
-    attackRange: 5
-    attackDamage: 4
-    attackCooldown: 2
-    detectionRange: 7
-    patrolRange: 5
+    attackRange: 3
+    attackDamage: 5
+    attackCooldown: 1.5
+    detectionRange: 10
+    patrolRange: 0
     isGuard: 0

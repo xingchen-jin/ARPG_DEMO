@@ -3,15 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NpcManager : Singleton<NpcManager>
+public class NPCManager : Singleton<NPCManager>
 {
-    [SerializeField] private NPC_Database_SO npcDatabase;
+    [SerializeField][Expandable]
+    private NPC_Database_SO npcDatabase;
+
     private Dictionary<int,NPCData> npcDict = new Dictionary<int, NPCData>();
     #region 生命周期函数
     protected override void Awake()
     {
         base.Awake();
         InitializeNPCDictionary();
+//        Debug.Log($"NPCManager 初始化完成，已加载 {npcDict.Count} 个NPC数据。");
     }
     #endregion
 

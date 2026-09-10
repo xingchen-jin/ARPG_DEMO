@@ -4,6 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NPC_Database_SO", menuName = "NPC/Database_SO")]
 public class NPC_Database_SO : ScriptableObject
 {
+    [SerializeField]
     public List<EnemyData> enemies;
     
 }

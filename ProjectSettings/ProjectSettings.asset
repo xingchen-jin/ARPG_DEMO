@@ -812,7 +812,8 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Standalone: MAGICACLOTH2
+    Android: GRAPH_DESIGNER
+    Standalone: MAGICACLOTH2;GRAPH_DESIGNER
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend: {}

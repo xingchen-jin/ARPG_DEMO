@@ -26,6 +26,8 @@ public class Singleton<T> : MonoBehaviour where T : Singleton<T>
         instance = (T)this;
         DontDestroyOnLoad(gameObject);// 保持单例对象在场景切换时不被销毁
 
+       // Debug.Log($"Singleton<{typeof(T).Name}> 已创建实例: {instance.gameObject.name}");
+
     }
     public static bool IsInstanceExists()
     {

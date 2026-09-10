@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 
 [RequireComponent(typeof(Animator))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour,IDamageable
 {
     PlayerInputData input;
     Animator animator;
@@ -227,5 +227,12 @@ public class PlayerController : MonoBehaviour
             ctx.wallNormal = Vector3.zero;
             Debug.Log("不可以攀爬");
         }
+    }
+
+    public void TakeDamage(int damage, GameObject attacker)
+    {
+        // 处理玩家受伤逻辑
+        Debug.Log($"玩家受到 {damage} 点伤害！");
+        //TODO: 可以在这里减少玩家的生命值，播放受伤动画等
     }
 }
