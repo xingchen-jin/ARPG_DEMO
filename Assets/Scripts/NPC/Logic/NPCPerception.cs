@@ -26,6 +26,7 @@ public class NPCPerception : MonoBehaviour
     //当前检测到的玩家
     private Transform detectedPlayer;
     public Transform DetectedPlayer => detectedPlayer;
+    
     #region Unity生命周期方法
     void Update()
     {

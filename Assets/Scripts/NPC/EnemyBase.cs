@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Opsive.BehaviorDesigner.Runtime;
 using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(BehaviorTree))]
 public class EnemyBase : MonoBehaviour, IDamageable
 {
+    
     [SerializeField] private EnemyData enemyData;
     [SerializeField] private int npcID; // 敌人的唯一ID，用于从数据库中获取数据
 
@@ -12,8 +16,32 @@ public class EnemyBase : MonoBehaviour, IDamageable
 
     //敌人的基础属性接口
     public EnemyData EnemyData => enemyData;
+    //自身组件
+    private Animator anim;
+    private BehaviorTree behaviorTree;
+    //动画播放机的动画哈希值
+    private static readonly int MoveSpeedID = Animator.StringToHash("MoveSpeed");
+
+    //动画参数阈值
+    [SerializeField]private float idleThreshold = 0;
+    [SerializeField]private float walkThreshold = 1.5f;
+    [SerializeField]private float RunThreshold = 3.5f;
+
+    //动画其他参数
+    [SerializeField]private float MoveDampTime = 0.1f;
 
     #region 生命周期
+    void Awake()
+    {
+        anim = GetComponent<Animator>();
+        behaviorTree = GetComponent<BehaviorTree>();
+
+        if(behaviorTree != null && enemyData != null)
+        {
+            //将敌人数据传递给行为树
+            behaviorTree.SetVariableValue("AttackRange", enemyData.attackRange);
+        }
+    }
     void Start()
     {
         if(!isSceneOriginObj)return; // 如果是手动添加的敌人数据，则不从数据库中获取数据
@@ -66,6 +94,43 @@ public class EnemyBase : MonoBehaviour, IDamageable
         // 可以在这里减少敌人的生命值，播放受伤动画等
 
     }
+    #region 动画设置
+
+    /// <summary>
+    /// 直接设置动画移动参数
+    /// </summary>
+    /// <param name="speed">移动速度</param>
+    public void SetMoveSpeed(float speed)
+    {
+        //设置动画混合树速度
+        anim.SetFloat(MoveSpeedID,speed,0.1f,Time.deltaTime);  
+    }
+    /// <summary>
+    /// 设置为行走
+    /// </summary>
+    public void SetIdle()
+    {
+        Debug.Log($"设置为待机状态，速度阈值: {idleThreshold}");
+        anim.SetFloat(MoveSpeedID,idleThreshold,MoveDampTime,Time.deltaTime);
+    }
+    public void SetWalking()
+    {
+        Debug.Log($"设置为行走状态，速度阈值: {walkThreshold}");
+        anim.SetFloat(MoveSpeedID,walkThreshold,MoveDampTime,Time.deltaTime);
+    }
+    public void SetRunning()
+    {
+        anim.SetFloat(MoveSpeedID,RunThreshold,MoveDampTime,Time.deltaTime);
+    }
+    #endregion
+    #region 动画事件
+    public void OnAttackHitEvent()
+    {
+        //TODO:设置攻击范围
+        //TODO:获取命中对象
+        //TODO:执行伤害逻辑
+    }
+    #endregion
     #endregion
 
     #region 私有方法

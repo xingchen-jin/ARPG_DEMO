@@ -6,7 +6,11 @@ using Opsive.BehaviorDesigner.Runtime.Tasks;
 using Opsive.GraphDesigner.Runtime.Variables;
 using Opsive.BehaviorDesigner.Runtime.Tasks.Actions;
 using UnityEngine.AI;
+using Opsive.Shared.Utility;
+using Opsive.BehaviorDesigner.Runtime.Tasks.Actions.AnimatorTasks;
 
+[Category("Custom/AI")]                  
+[Description("NPC 巡逻行为，使用 NavMeshAgent 进行移动。")]
 public class Partol : Action
 {
     [Header("巡逻参数")]
@@ -19,6 +23,12 @@ public class Partol : Action
     [Tooltip("可选的巡逻中心点，留空则使用自身位置")]
     public SharedVariable<Transform> patrolCenter;
 
+    // [Header("动画参数")]
+    // [Tooltip("要播放的动画状态名")]
+    // [SerializeField] protected string m_AnimationStateName = "Locomotion";
+    // [Tooltip("动画过渡时间，0 表示瞬间切换。")]
+    // [SerializeField] protected float m_TransitionDuration = 0.1f;
+    private int m_AnimationStateHash;
     //私有属性
     private NavMeshAgent _agent;
     private EnemyBase _enemyBase;
@@ -43,6 +53,7 @@ public class Partol : Action
         if (_agent != null)
         {
             _agent.speed = _enemyBase != null ? _enemyBase.EnemyData.walkSpeed : 3.5f; // 设置NavMeshAgent的速度为敌人的移动速度
+
         }
         _isWaiting = false;
         _hasTarget = false;
@@ -50,7 +61,12 @@ public class Partol : Action
         _retryCount = 0;
         _fixedCenterPoint = patrolCenter != null && patrolCenter.Value != null ? patrolCenter.Value.position : transform.position;
         SetNewTargetPoint();
+
+        // m_AnimationStateHash = Animator.StringToHash(m_AnimationStateName);
+        // SetAnimationState(m_AnimationStateHash, m_TransitionDuration);
     }
+
+
     public override TaskStatus OnUpdate()
     {
         if (_agent == null || !_agent.isOnNavMesh)
@@ -77,11 +93,12 @@ public class Partol : Action
             }
             return TaskStatus.Running;
         }
-
+        // 检查是否到达目标点
         if(!_agent.pathPending && _agent.remainingDistance <= arrivalDistance.Value)
         {
             _isWaiting = true;
             _waitTimer = 0f;
+            _enemyBase.SetIdle(); // 设置为待机状态
         }
 
         return TaskStatus.Running;
@@ -111,6 +128,8 @@ public class Partol : Action
         {
             _targetPoint = hit.position;
             _agent.SetDestination(_targetPoint);
+            _enemyBase.SetWalking(); // 设置为行走状态
+
             _hasTarget = true;
             _retryCount = 0; // 重置重试计数
         }
@@ -124,12 +143,34 @@ public class Partol : Action
                 //使用中心点作为目标点
                 _targetPoint = center;
                 _agent.SetDestination(_targetPoint);
+                _enemyBase.SetWalking(); // 设置为行走状态
+                
                 _retryCount = 0; // 重置重试计数
                 _hasTarget = true;
                 return;     //直接返回，没有继续要做的了
             }
 
         }
+        
     }
+    
+    // /// <summary>
+    // /// 设置动画状态
+    // /// </summary>
+    // /// <param name="m_AnimationStateHash"></param>
+    // /// <param name="m_TransitionDuration"></param>
+    // /// <exception cref="System.NotImplementedException"></exception>
+    // private void SetAnimationState(int m_AnimationStateHash, float m_TransitionDuration)
+    // {
+    //     Animator animator = GetComponent<Animator>();
+    //     if (animator != null)
+    //     {
+    //         animator.CrossFadeInFixedTime(m_AnimationStateHash, m_TransitionDuration);
+    //     }
+    //     else
+    //     {
+    //         Debug.LogWarning("Animator组件未找到，无法设置动画状态。");
+    //     }
+    // }
     #endregion
 }

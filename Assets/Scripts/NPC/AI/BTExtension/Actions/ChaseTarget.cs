@@ -3,11 +3,15 @@ using Opsive.GraphDesigner.Runtime.Variables;
 using UnityEngine.AI;
 using Opsive.BehaviorDesigner.Runtime.Tasks;
 using Opsive.BehaviorDesigner.Runtime.Tasks.Actions;
+using Opsive.Shared.Utility;
 
+
+[Category("Custom/AI")]                  
+[Description("追逐目标，使用 NavMeshAgent 进行移动。")]
 public class ChaseTarget : Action
 {
     [Header("追逐目标")]
-    public SharedVariable<Transform> target;
+    public SharedVariable<GameObject> target;
 
     [Header("默认参数（当 EnemyData 为空时使用）")]
     [SerializeField] private float defaultSpeed = 3.5f;
@@ -18,6 +22,7 @@ public class ChaseTarget : Action
     [SerializeField] private float repathThreshold = 0.5f;
 
     //私有属性
+    private Transform _targetTransform;
     private NavMeshAgent _agent;
     private EnemyBase _enemyBase;
     //追逐属性
@@ -49,6 +54,8 @@ public class ChaseTarget : Action
         _agent.isStopped = false; // 确保NavMeshAgent处于移动状态
         _lastTargetPosition = Vector3.positiveInfinity; // 初始化为一个不可能的值，确保第一次会设置目的地
         _hasSetDestination = false;
+
+        _targetTransform = target != null && target.Value != null ? target.Value.transform : null;
     }
 
     public override TaskStatus OnUpdate()
@@ -58,13 +65,16 @@ public class ChaseTarget : Action
             return TaskStatus.Failure;
         if (target == null || target.Value == null)
             return TaskStatus.Failure;
+        if (_targetTransform == null)
+            return TaskStatus.Failure;
 
         // 设置目标位置
-        if (!_hasSetDestination || Vector3.Distance(_lastTargetPosition, target.Value.position) > repathThreshold)
+        if (!_hasSetDestination || Vector3.Distance(_lastTargetPosition, _targetTransform.position) > repathThreshold)
         {
-            if(_agent.SetDestination(target.Value.position))
+            if(_agent.SetDestination(_targetTransform.position))
             {
-                _lastTargetPosition = target.Value.position;
+                _lastTargetPosition = _targetTransform.position;
+                _enemyBase.SetRunning(); // 设置为奔跑状态
                 _hasSetDestination = true;
             }else
             {
