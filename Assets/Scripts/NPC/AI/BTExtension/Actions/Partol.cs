@@ -1,18 +1,135 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Opsive.BehaviorDesigner.Runtime.Tasks.Conditionals;
+using Opsive.BehaviorDesigner.Runtime.Tasks;
+using Opsive.GraphDesigner.Runtime.Variables;
+using Opsive.BehaviorDesigner.Runtime.Tasks.Actions;
+using UnityEngine.AI;
 
-public class Partol : 
+public class Partol : Action
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [Header("巡逻参数")]
+    [Tooltip("巡逻半径")]
+    public SharedVariable<float> patrolRadius = 10f;
+    [Tooltip("巡逻结束等待时间")]
+    public SharedVariable<float> waitTime = 5f;
+    [Tooltip("到达目标点的判定距离")]
+    public SharedVariable<float> arrivalDistance = 1f;
+    [Tooltip("可选的巡逻中心点，留空则使用自身位置")]
+    public SharedVariable<Transform> patrolCenter;
 
-    // Update is called once per frame
-    void Update()
+    //私有属性
+    private NavMeshAgent _agent;
+    private EnemyBase _enemyBase;
+    private Vector3 _targetPoint;
+    private Vector3 _fixedCenterPoint; // 固定的巡逻中心点，避免每次都计算
+    private float _waitTimer;
+    private bool _isWaiting;
+    private bool _hasTarget;
+
+    private int _retryCount = 0;
+    private const int MaxRetryCount = 5; // 最大重试次数
+
+
+    #region 行为树生命周期方法
+    public override void OnAwake()
     {
-        
+        _agent = GetComponent<NavMeshAgent>();
+        _enemyBase = GetComponent<EnemyBase>();
     }
+    public override void OnStart()
+    {
+        if (_agent != null)
+        {
+            _agent.speed = _enemyBase != null ? _enemyBase.EnemyData.walkSpeed : 3.5f; // 设置NavMeshAgent的速度为敌人的移动速度
+        }
+        _isWaiting = false;
+        _hasTarget = false;
+        _waitTimer = 0f;
+        _retryCount = 0;
+        _fixedCenterPoint = patrolCenter != null && patrolCenter.Value != null ? patrolCenter.Value.position : transform.position;
+        SetNewTargetPoint();
+    }
+    public override TaskStatus OnUpdate()
+    {
+        if (_agent == null || !_agent.isOnNavMesh)
+        {
+            Debug.LogWarning("NavMeshAgent没有正确设置或不在NavMesh上，无法执行巡逻行为。");
+            return TaskStatus.Failure;
+        }
+        if (!_hasTarget)
+        {
+            SetNewTargetPoint();
+            if(!_hasTarget)
+            {
+                return TaskStatus.Running; // 没有找到有效的目标点，继续找
+            }
+        }
+        if (_isWaiting)
+        {
+            _waitTimer += Time.deltaTime;
+            if (_waitTimer >= waitTime.Value)
+            {
+                _isWaiting = false;
+                _hasTarget = false;
+                SetNewTargetPoint();
+            }
+            return TaskStatus.Running;
+        }
+
+        if(!_agent.pathPending && _agent.remainingDistance <= arrivalDistance.Value)
+        {
+            _isWaiting = true;
+            _waitTimer = 0f;
+        }
+
+        return TaskStatus.Running;
+    }
+    public override void OnEnd()
+    {
+        if (_agent != null && _agent.isOnNavMesh)
+            _agent.ResetPath();
+        _hasTarget = false;
+        _isWaiting = false;
+    }
+    #endregion
+    
+    #region 私有方法    
+    /// <summary>
+    /// 设置新的巡逻目标点
+    /// </summary>
+    private void SetNewTargetPoint()
+    {
+        Vector3 center = _fixedCenterPoint;
+        //水平平面内随机选取一点
+        Vector2 randomCircle = Random.insideUnitCircle * patrolRadius.Value;
+        Vector3 randomPoint = new Vector3(randomCircle.x, 0, randomCircle.y) + center;
+
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(randomPoint, out hit, 2.0f, NavMesh.AllAreas))
+        {
+            _targetPoint = hit.position;
+            _agent.SetDestination(_targetPoint);
+            _hasTarget = true;
+            _retryCount = 0; // 重置重试计数
+        }
+        else
+        {
+            _retryCount++;
+            _hasTarget = false; // 没有找到有效的点，标记为没有目标
+            if (_retryCount >= MaxRetryCount)
+            {
+                Debug.LogWarning("未能在指定半径内找到有效的巡逻点。");
+                //使用中心点作为目标点
+                _targetPoint = center;
+                _agent.SetDestination(_targetPoint);
+                _retryCount = 0; // 重置重试计数
+                _hasTarget = true;
+                return;     //直接返回，没有继续要做的了
+            }
+
+        }
+    }
+    #endregion
 }

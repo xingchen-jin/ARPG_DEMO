@@ -92,7 +92,7 @@ public class NPCPerception : MonoBehaviour
     #endregion
 
     #region 调试方法
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         if (!showDebug) return;
 

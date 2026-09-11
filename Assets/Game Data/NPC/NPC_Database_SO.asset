@@ -18,10 +18,11 @@ MonoBehaviour:
     npcPrefab: {fileID: 8371692083697577207, guid: a109557cf2f2d9b41baa13a276a54a4a,
       type: 3}
     maxHealth: 100
-    currentHealth: 0
-    moveSpeed: 5
+    currentHealth: 100
+    walkSpeed: 2.5
+    runSpeed: 2.5
     rotationSpeed: 3
-    attackRange: 3
+    attackRange: 1.5
     attackDamage: 5
     attackCooldown: 1.5
     detectionRange: 10

@@ -8,9 +8,18 @@ public class NPCData
     public int npcID;
     public string npcName;
     public GameObject npcPrefab;
+    [Header("基础属性")]
+    [Tooltip("最大生命值")]
     public float maxHealth;
+    [Tooltip("当前生命值")]
     public float currentHealth;
-    public float moveSpeed;
+    
+    [Tooltip("步行速度")]
+    public float walkSpeed;
+    [Tooltip("奔跑速度")]
+    public float runSpeed;
+
+    [Tooltip("旋转速度")]
     public float rotationSpeed;
 }
 
@@ -29,4 +38,5 @@ public class EnemyData : NPCData
     public float patrolRange;
     [Header("是否为守卫")]
     public bool isGuard;
+
 }

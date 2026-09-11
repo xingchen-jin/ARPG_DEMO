@@ -10,6 +10,9 @@ public class EnemyBase : MonoBehaviour, IDamageable
     [Header("是否在场景中手动添加")]
     [SerializeField] private bool isSceneOriginObj = false; // 是否在场景中手动添加敌人数据
 
+    //敌人的基础属性接口
+    public EnemyData EnemyData => enemyData;
+
     #region 生命周期
     void Start()
     {
@@ -84,5 +87,75 @@ public class EnemyBase : MonoBehaviour, IDamageable
         Destroy(gameObject); // 销毁敌人对象
     }
 
+    #endregion
+
+    #region Debug方法
+    private Mesh _rangeMesh; // 用于绘制攻击范围的Mesh
+    private void OnDrawGizmosSelected()
+    {
+        if(enemyData == null) return;
+        //脚底位置
+        Vector3 position = transform.position + Vector3.up * 0.1f; // 提升一点高度，避免与地面重叠
+        float radius = enemyData.attackRange; // 使用敌人的攻击范围
+
+        //半透明实心圆
+        Gizmos.color = new Color(1f, 0f, 0f, 1f); // 红色，半透明
+        Gizmos.DrawMesh(GetRangeMesh(), position, Quaternion.identity,new Vector3(radius, 1f, radius)); // 绘制圆形Mesh，缩放为直径
+        DrawFlatCircle(position, radius, Color.red, 64);
+    }
+    private void DrawFlatCircle(Vector3 center, float radius,Color color,int segments = 64)
+    {
+        //更改画笔元素
+        Color preColor = Gizmos.color;
+        Gizmos.color = color;
+        //获得步长
+        float step = 2f * Mathf.PI / segments;
+        //计算起始点
+        Vector3 prevPoint = center + new Vector3(radius, 0, 0);
+
+        //类似微分的思想画圆
+        for (int i = 1; i <= segments; i++)
+        {
+            float angle = step * i;
+            Vector3 currentPoint = center + new Vector3(Mathf.Cos(angle) * radius, 0, Mathf.Sin(angle) * radius);
+            Gizmos.DrawLine(prevPoint, currentPoint);
+            prevPoint = currentPoint;
+        }
+
+        //恢复画笔颜色
+        Gizmos.color = preColor;
+    }
+private Mesh GetRangeMesh()
+{
+    if (_rangeMesh != null) return _rangeMesh;
+
+    const int segments = 64;
+    _rangeMesh = new Mesh { name = "AttackRangeDisc" };
+    _rangeMesh.hideFlags = HideFlags.HideAndDontSave;
+
+    var vertices = new Vector3[segments + 1];
+    var triangles = new int[segments * 3];
+
+    vertices[0] = Vector3.zero;                    // 圆心
+    for (int i = 0; i < segments; i++)
+    {
+        float angle = 2f * Mathf.PI * i / segments;
+        vertices[i + 1] = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+    }
+
+    for (int i = 0; i < segments; i++)
+    {
+        int t = i * 3;
+        triangles[t]     = 0;
+        triangles[t + 1] = (i + 1) % segments + 1;  // 改为逆时针
+        triangles[t + 2] = i + 1;
+    }
+
+    _rangeMesh.vertices = vertices;
+    _rangeMesh.triangles = triangles;
+    _rangeMesh.RecalculateNormals();
+    _rangeMesh.RecalculateBounds();
+    return _rangeMesh;
+}
     #endregion
 }
