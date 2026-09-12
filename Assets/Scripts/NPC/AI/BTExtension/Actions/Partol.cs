@@ -52,7 +52,8 @@ public class Partol : Action
     {
         if (_agent != null)
         {
-            _agent.speed = _enemyBase != null ? _enemyBase.EnemyData.walkSpeed : 3.5f; // 设置NavMeshAgent的速度为敌人的移动速度
+            //EnemyData 可能尚未初始化（数据库里没有该 ID 等情况），取不到时用默认速度
+            _agent.speed = _enemyBase != null && _enemyBase.EnemyData != null ? _enemyBase.EnemyData.walkSpeed : 3.5f; // 设置NavMeshAgent的速度为敌人的移动速度
 
         }
         _isWaiting = false;
@@ -144,7 +145,6 @@ public class Partol : Action
                 _targetPoint = center;
                 _agent.SetDestination(_targetPoint);
                 _enemyBase.SetWalking(); // 设置为行走状态
-                
                 _retryCount = 0; // 重置重试计数
                 _hasTarget = true;
                 return;     //直接返回，没有继续要做的了

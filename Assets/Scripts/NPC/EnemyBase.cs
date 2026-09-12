@@ -30,17 +30,28 @@ public class EnemyBase : MonoBehaviour, IDamageable
     //动画其他参数
     [SerializeField]private float MoveDampTime = 0.1f;
 
+    //动画移动参数的目标值与平滑后的当前值
+    private float _targetMoveSpeed;
+    private float _currentMoveSpeed;
+    private float _moveSpeedVelocity;
+
     #region 生命周期
     void Awake()
     {
         anim = GetComponent<Animator>();
         behaviorTree = GetComponent<BehaviorTree>();
 
-        if(behaviorTree != null && enemyData != null)
-        {
-            //将敌人数据传递给行为树
-            behaviorTree.SetVariableValue("AttackRange", enemyData.attackRange);
-        }
+        //将敌人数据传递给行为树
+        SyncAttackRangeToBehaviorTree();
+    }
+    void Update()
+    {
+        if (anim == null) return;
+        //Animator.SetFloat 的阻尼重载需要每帧调用才会收敛，
+        //只在状态切换时调用一次，参数只会移动一小段距离，混合树永远到不了行走/奔跑阈值。
+        //因此这里统一在 Update 中把参数平滑推向目标值。
+        _currentMoveSpeed = Mathf.SmoothDamp(_currentMoveSpeed, _targetMoveSpeed, ref _moveSpeedVelocity, MoveDampTime);
+        anim.SetFloat(MoveSpeedID, _currentMoveSpeed);
     }
     void Start()
     {
@@ -97,30 +108,34 @@ public class EnemyBase : MonoBehaviour, IDamageable
     #region 动画设置
 
     /// <summary>
-    /// 直接设置动画移动参数
+    /// 设置动画移动参数的目标值，具体数值由 Update 平滑写入 Animator。
+    /// 行为树节点只需声明“想以多快的速度移动”，不需要每帧调用。
     /// </summary>
-    /// <param name="speed">移动速度</param>
+    /// <param name="speed">目标移动速度</param>
     public void SetMoveSpeed(float speed)
     {
-        //设置动画混合树速度
-        anim.SetFloat(MoveSpeedID,speed,0.1f,Time.deltaTime);  
+        _targetMoveSpeed = speed;
+    }
+    /// <summary>
+    /// 设置为待机
+    /// </summary>
+    public void SetIdle()
+    {
+        SetMoveSpeed(idleThreshold);
     }
     /// <summary>
     /// 设置为行走
     /// </summary>
-    public void SetIdle()
-    {
-        Debug.Log($"设置为待机状态，速度阈值: {idleThreshold}");
-        anim.SetFloat(MoveSpeedID,idleThreshold,MoveDampTime,Time.deltaTime);
-    }
     public void SetWalking()
     {
-        Debug.Log($"设置为行走状态，速度阈值: {walkThreshold}");
-        anim.SetFloat(MoveSpeedID,walkThreshold,MoveDampTime,Time.deltaTime);
+        SetMoveSpeed(walkThreshold);
     }
+    /// <summary>
+    /// 设置为奔跑
+    /// </summary>
     public void SetRunning()
     {
-        anim.SetFloat(MoveSpeedID,RunThreshold,MoveDampTime,Time.deltaTime);
+        SetMoveSpeed(RunThreshold);
     }
     #endregion
     #region 动画事件
@@ -141,8 +156,24 @@ public class EnemyBase : MonoBehaviour, IDamageable
         if (enemyData == null)
         {
             Debug.LogError($"未能获取到敌人数据，敌人ID: {npcID}，请检查数据库！");
+            return; // 取不到数据时不要继续，否则下面会空引用
         }
         enemyData.currentHealth = enemyData.maxHealth; // 初始化当前生命值
+
+        //数据是从数据库重新取的，行为树里的攻击范围要同步刷新，
+        //否则行为树还在用 Awake 时写入的预制体数值，和 ChaseTarget 使用的攻击范围不一致。
+        SyncAttackRangeToBehaviorTree();
+    }
+
+    /// <summary>
+    /// 把当前的攻击范围同步给行为树，保证行为树判断和移动逻辑用的是同一个值
+    /// </summary>
+    private void SyncAttackRangeToBehaviorTree()
+    {
+        if (behaviorTree != null && enemyData != null)
+        {
+            behaviorTree.SetVariableValue("AttackRange", enemyData.attackRange);
+        }
     }
     private void Die()
     {

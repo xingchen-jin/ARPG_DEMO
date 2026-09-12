@@ -23,6 +23,7 @@ public class PlayAttackAnimation : Action
 
     public override void OnStart()
     {
+        Debug.Log($"[PlayAttackAnimation] 开始播放攻击动画: {m_AnimationStateName}");
         base.OnStart();
 
         if (m_Animator == null)
