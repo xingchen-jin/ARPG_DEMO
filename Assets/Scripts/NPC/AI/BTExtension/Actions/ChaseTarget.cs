@@ -150,7 +150,7 @@ public class ChaseTarget : Action
     {
         if (_enemyBase != null && _enemyBase.EnemyData != null)
         {
-            return _enemyBase.EnemyData.attackRange * stoppingDistanceScale;
+            return _enemyBase.EnemyData.attackDistance * stoppingDistanceScale;
         }
         return defaultStoppingDistance;
     }

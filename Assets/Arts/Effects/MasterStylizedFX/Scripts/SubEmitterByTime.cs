@@ -23,7 +23,7 @@ namespace MasterStylizedExplosions
             if (Particle != null && Timer >= TriggerInterval)
             {
 
-                //Debug.Log("TriggerSubEmitter");
+                //.Log("TriggerSubEmitter");
                 if (Particle.isPlaying)
                 {
                     Timer = 0;

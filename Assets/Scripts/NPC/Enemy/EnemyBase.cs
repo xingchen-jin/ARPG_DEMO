@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Opsive.BehaviorDesigner.Runtime;
@@ -28,12 +29,27 @@ public class EnemyBase : MonoBehaviour, IDamageable
     [SerializeField]private float RunThreshold = 3.5f;
 
     //动画其他参数
+    [Tooltip("动画参数平滑时间，越小越快")]
     [SerializeField]private float MoveDampTime = 0.1f;
 
     //动画移动参数的目标值与平滑后的当前值
     private float _targetMoveSpeed;
     private float _currentMoveSpeed;
     private float _moveSpeedVelocity;
+
+    [Header("攻击判定球")]
+    [SerializeField]private Transform attackPoint; // 攻击点位置
+    [SerializeField]private LayerMask attackMask; // 攻击层
+
+    [Header("调试")]
+    [Tooltip("是否显示攻击范围")]
+    [SerializeField]private bool showAttackDistance = false; // 是否显示攻击范围
+    [SerializeField]private Color attackDistanceColor = Color.red; // 攻击范围颜色
+    [Tooltip("是否显示攻击球半径")]
+    [SerializeField]private bool showAttackSphereRadius = false; // 是否显示攻击球半径
+    [SerializeField]private Color attackSphereRadiusColor = Color.blue; // 攻击球半径颜色
+
+
 
     #region 生命周期
     void Awake()
@@ -42,7 +58,7 @@ public class EnemyBase : MonoBehaviour, IDamageable
         behaviorTree = GetComponent<BehaviorTree>();
 
         //将敌人数据传递给行为树
-        SyncAttackRangeToBehaviorTree();
+        SyncAttackDistanceToBehaviorTree();
     }
     void Update()
     {
@@ -88,12 +104,13 @@ public class EnemyBase : MonoBehaviour, IDamageable
     #endregion
     
     #region 公有方法
+    #region  一般方法
     /// <summary>
     /// 受到伤害的方法，实现IDamageable接口
     /// </summary>
     /// <param name="damage"></param>
     /// <param name="attacker"></param>
-    public void TakeDamage(int damage, GameObject attacker)
+    public void TakeDamage(float damage, GameObject attacker)
     {
         // 处理敌人受伤逻辑
         Debug.Log($"敌人受到 {damage} 点伤害！");
@@ -105,6 +122,7 @@ public class EnemyBase : MonoBehaviour, IDamageable
         // 可以在这里减少敌人的生命值，播放受伤动画等
 
     }
+    #endregion
     #region 动画设置
 
     /// <summary>
@@ -141,9 +159,7 @@ public class EnemyBase : MonoBehaviour, IDamageable
     #region 动画事件
     public void OnAttackHitEvent()
     {
-        //TODO:设置攻击范围
-        //TODO:获取命中对象
-        //TODO:执行伤害逻辑
+        TrrigerAttack();
     }
     #endregion
     #endregion
@@ -162,19 +178,39 @@ public class EnemyBase : MonoBehaviour, IDamageable
 
         //数据是从数据库重新取的，行为树里的攻击范围要同步刷新，
         //否则行为树还在用 Awake 时写入的预制体数值，和 ChaseTarget 使用的攻击范围不一致。
-        SyncAttackRangeToBehaviorTree();
+        SyncAttackDistanceToBehaviorTree();
     }
 
     /// <summary>
-    /// 把当前的攻击范围同步给行为树，保证行为树判断和移动逻辑用的是同一个值
+    /// 触发攻击
     /// </summary>
-    private void SyncAttackRangeToBehaviorTree()
+    private void TrrigerAttack()
+    {
+        //在攻击点位置创建一个球形碰撞体，检测所有在攻击范围内的敌人
+        Collider[] hitColliders = Physics.OverlapSphere(attackPoint.position, enemyData.attackSphereRadius, attackMask);
+        foreach (var hitCollider in hitColliders)
+        {
+            //检查碰撞体是否有IDamageable接口
+            IDamageable damageable = hitCollider.GetComponent<IDamageable>();
+            if (damageable != null)
+            {
+                //调用受伤方法，传入伤害值和攻击者对象
+                damageable.TakeDamage(enemyData.attackDamage, gameObject);
+            }
+        }
+    }
+    #region 行为树设置
+    /// <summary>
+    /// 把当前的攻击范围同步给行为树，保证行为树判断和移动逻辑用的是同一个值
+    /// </summary>    
+    private void SyncAttackDistanceToBehaviorTree()
     {
         if (behaviorTree != null && enemyData != null)
         {
-            behaviorTree.SetVariableValue("AttackRange", enemyData.attackRange);
+            behaviorTree.SetVariableValue("AttackDistance", enemyData.attackDistance);
         }
     }
+    #endregion
     private void Die()
     {
         // 处理敌人死亡逻辑
@@ -190,15 +226,21 @@ public class EnemyBase : MonoBehaviour, IDamageable
     private void OnDrawGizmosSelected()
     {
         if(enemyData == null) return;
-        //脚底位置
-        Vector3 position = transform.position + Vector3.up * 0.1f; // 提升一点高度，避免与地面重叠
-        float radius = enemyData.attackRange; // 使用敌人的攻击范围
-
-        //半透明实心圆
-        Gizmos.color = new Color(1f, 0f, 0f, 1f); // 红色，半透明
-        Gizmos.DrawMesh(GetRangeMesh(), position, Quaternion.identity,new Vector3(radius, 1f, radius)); // 绘制圆形Mesh，缩放为直径
-        DrawFlatCircle(position, radius, Color.red, 64);
+        if(showAttackDistance)
+        {
+            //脚底位置
+            Vector3 position = transform.position + Vector3.up * 0.1f; // 提升一点高度，避免与地面重叠
+            float radius = enemyData.attackDistance; // 使用敌人的攻击范围
+            DrawFlatCircle(position, radius, attackDistanceColor, 64);
+        }
+        if(showAttackSphereRadius && attackPoint != null)
+        {
+            Gizmos.color = attackSphereRadiusColor;
+            Gizmos.DrawWireSphere(attackPoint.position, enemyData.attackSphereRadius);
+        }
     }
+
+
     private void DrawFlatCircle(Vector3 center, float radius,Color color,int segments = 64)
     {
         //更改画笔元素

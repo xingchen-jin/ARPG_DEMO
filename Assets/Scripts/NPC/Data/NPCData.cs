@@ -26,14 +26,14 @@ public class NPCData
 [System.Serializable]
 public class EnemyData : NPCData
 {
-    [Header("攻击范围")]
-    public float attackRange;
+    [Header("攻击判断距离")]
+    public float attackDistance;
+    [Header("攻击球范围")]
+    public float attackSphereRadius;
     [Header("攻击伤害")]
     public float attackDamage;
     [Header("攻击冷却")]
     public float attackCooldown;
-    [Header("检测范围")]
-    public float detectionRange;
     [Header("巡逻范围")]
     public float patrolRange;
     [Header("是否为守卫")]

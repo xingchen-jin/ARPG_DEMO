@@ -16,7 +16,10 @@ public class PlayerController : MonoBehaviour,IDamageable
     private WeaponController weaponController;
     private InputHandler inputHandler;
 
-    [HideInInspector]public PlayerFSMContext ctx;
+    public PlayerFSMContext ctx;
+    [Header("基础数值属性")]
+    [Expandable][SerializeField]
+    private PlayerBaseInfo_SO playerBaseInfo;
     [Header("地面检测")]
     [SerializeField]private float groundCheckOffset = 0.1f;
     
@@ -43,9 +46,12 @@ public class PlayerController : MonoBehaviour,IDamageable
         ctx.canJump = true;
         inputHandler.ctx = ctx; //将ctx传递给InputHandler
         
+        //初始化玩家基础属性
+        playerBaseInfo.currentHealth = playerBaseInfo.maxHealth;
+
+
         //地面检测
         // groundCheckOffset = controller.radius + 0.1f;//设置偏移量为胶囊体半径+0.1f，避免检测到自身
-
     }
     void OnEnable()
     {
@@ -171,10 +177,6 @@ public class PlayerController : MonoBehaviour,IDamageable
     //     animator.SetIKRotationWeight(AvatarIKGoal.LeftHand, handWeight);
     //     animator.SetIKRotationWeight(AvatarIKGoal.RightHand, handWeight);
     // }
-    private void OnSwitchWeapon()
-    {
-        
-    }
 
 
     bool CheckGrounded()
@@ -208,31 +210,27 @@ public class PlayerController : MonoBehaviour,IDamageable
         }
     }
 
-    void checkedclimb()
+    public void TakeDamage(float damage, GameObject attacker)
     {
-        // 检查是否可以攀爬
-        if (climbDetector.TryGetClimbInfo(out ClimbType climbType, out Vector3 wallPoint, out Vector3 wallNormal))
+        float currentHealth = playerBaseInfo.currentHealth;
+        currentHealth -= damage;
+        playerBaseInfo.currentHealth = currentHealth;
+        if (currentHealth <= 0)
         {
-            ctx.climbType = climbType;
-            ctx.canClimb = true;
-            ctx.wallPoint = wallPoint;
-            ctx.wallNormal = wallNormal;
-            Debug.Log("可以攀爬");
+            // 处理玩家死亡逻辑
+            Debug.Log("玩家死亡！");
+            //TODO: 可以在这里触发玩家死亡动画、游戏结束等逻辑
         }
         else
         {
-            ctx.climbType = ClimbType.None;
-            ctx.canClimb = false;
-            ctx.wallPoint = Vector3.zero;
-            ctx.wallNormal = Vector3.zero;
-            Debug.Log("不可以攀爬");
+            // 处理玩家受伤逻辑
+            Debug.Log($"玩家受到 {damage} 点伤害！当前生命值: {currentHealth}");
         }
-    }
 
-    public void TakeDamage(int damage, GameObject attacker)
-    {
-        // 处理玩家受伤逻辑
-        Debug.Log($"玩家受到 {damage} 点伤害！");
-        //TODO: 可以在这里减少玩家的生命值，播放受伤动画等
+        //TODO： 刷新UI血条
+        //TODO: 播放受伤动画
+
+
+
     }
 }

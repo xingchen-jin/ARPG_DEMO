@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ba2646d511582a248a6b8509c09d05a7, type: 3}
-  m_Name: FirearmDatas_SO
+  m_Name: FirearmDetails_SO
   m_EditorClassIdentifier: 
   firearmDetailsList:
   - itemID: 1001

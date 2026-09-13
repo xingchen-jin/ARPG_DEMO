@@ -22,9 +22,9 @@ MonoBehaviour:
     walkSpeed: 2.5
     runSpeed: 2.5
     rotationSpeed: 3
-    attackRange: 0.5
+    attackDistance: 1.2
+    attackSphereRadius: 0.5
     attackDamage: 5
     attackCooldown: 1.5
-    detectionRange: 10
-    patrolRange: 0
+    patrolRange: 5
     isGuard: 0

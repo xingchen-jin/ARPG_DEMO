@@ -4,7 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using System;
 
-public class CinemachineController : MonoBehaviour
+public class CameraZoomController : MonoBehaviour
 {
     private CinemachineVirtualCamera virtualCamera;
     private CinemachineFramingTransposer framingTransposer;
