@@ -5,9 +5,11 @@ using UnityEngine;
 
 public class WeaponAimingState : StateBase<PlayerFSMContext>
 {   
-    private float roundsPerMinute = 600f; 
-    private float FireInterval => 60f / roundsPerMinute; 
+    private float roundsPerMinute = 600f;
+    private float FireInterval => 60f / roundsPerMinute;
     private float gunTimer = 0f;
+    //躯干瞄准权重是否应当打开，实际数值在 OnFixedUpdate 里平滑过渡
+    private bool _bodyAimActive;
 
     public override void OnEnter()
     {
@@ -33,6 +35,7 @@ public class WeaponAimingState : StateBase<PlayerFSMContext>
         ctx.weaponController.SetLeftHandIKWeight(1.0f);
         ctx.rightHandIK.weight = 1;
         ctx.handAim.weight = 1;
+        _bodyAimActive = true; //躯干权重在 OnFixedUpdate 里淡入
 
        ctx.canRun = false;
        ctx.canRoate = false;
@@ -51,6 +54,11 @@ public class WeaponAimingState : StateBase<PlayerFSMContext>
         CameraManager.Instance.SwitchToNormalCamera();
 
         ctx.handAim.weight = 0;
+
+        //本状态退出后不再有 OnFixedUpdate，躯干权重必须在这里归零，否则会一直跟准星
+        _bodyAimActive = false;
+        if (ctx.spineAim != null) ctx.spineAim.weight = 0f;
+        if (ctx.chestAim != null) ctx.chestAim.weight = 0f;
     }
 
     public override void OnFixedUpdate()
@@ -64,6 +72,7 @@ public class WeaponAimingState : StateBase<PlayerFSMContext>
         ctx.aimPitch = Mathf.Clamp(ctx.aimPitch, ctx.aimPitchMin, ctx.aimPitchMax);
         ctx.aimPivot.localRotation = Quaternion.Euler(ctx.aimPitch, 0, 0);
 
+        UpdateBodyAimWeight();
     }
 
     public override void OnLateUpdate()
@@ -81,6 +90,20 @@ public class WeaponAimingState : StateBase<PlayerFSMContext>
     }
 
     #region 私有方法
+    /// <summary>
+    /// 平滑把躯干瞄准权重推向目标值：只在瞄准时让脊柱/胸分担一部分俯仰，
+    /// 权重过大或不分担都会导致整个上半身跟着准星扭。
+    /// </summary>
+    private void UpdateBodyAimWeight()
+    {
+        float step = ctx.aimWeightFadeSpeed * Time.fixedDeltaTime;
+
+        if (ctx.spineAim != null)
+            ctx.spineAim.weight = Mathf.MoveTowards(ctx.spineAim.weight, _bodyAimActive ? ctx.spineAimWeight : 0f, step);
+        if (ctx.chestAim != null)
+            ctx.chestAim.weight = Mathf.MoveTowards(ctx.chestAim.weight, _bodyAimActive ? ctx.chestAimWeight : 0f, step);
+    }
+
     private Vector3 GetAimTargetPosition()
     {
         Camera cam = Camera.main; // 当前自由视角相机

@@ -6,6 +6,7 @@ public interface IEvent
 {
 
 }
+#region 武器相关事件
 /// <summary>
 /// 武器切换事件
 /// </summary>
@@ -53,6 +54,12 @@ public struct FireRequestEvent : IEvent
     }
 }
 
+#endregion
+
+#region UI事件
+/// <summary>
+/// 切换输入模式事件
+/// </summary>
 public struct SwitchInputModeEvent : IEvent
 {
     public InputMode inputMode;
@@ -61,3 +68,17 @@ public struct SwitchInputModeEvent : IEvent
         this.inputMode = inputMode;
     }
 }
+/// <summary>
+/// 血量更新事件
+/// </summary>
+public struct UpdateHealthEvent : IEvent
+{
+    public float curHealth;
+    public float maxHealth;
+    public UpdateHealthEvent(float curHealth, float maxHealth)
+    {
+        this.curHealth = curHealth;
+        this.maxHealth = maxHealth;
+    }
+}
+#endregion

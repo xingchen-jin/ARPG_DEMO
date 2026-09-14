@@ -48,7 +48,8 @@ public class PlayerController : MonoBehaviour,IDamageable
         
         //初始化玩家基础属性
         playerBaseInfo.currentHealth = playerBaseInfo.maxHealth;
-
+        //TODO: 在游戏开始时，刷新UI血条，后续可以改为角色初始化时触发事件，UI监听事件刷新血条
+        EventCenter.EventTrigger<UpdateHealthEvent>(new UpdateHealthEvent(playerBaseInfo.currentHealth, playerBaseInfo.maxHealth));
 
         //地面检测
         // groundCheckOffset = controller.radius + 0.1f;//设置偏移量为胶囊体半径+0.1f，避免检测到自身
@@ -227,7 +228,8 @@ public class PlayerController : MonoBehaviour,IDamageable
             Debug.Log($"玩家受到 {damage} 点伤害！当前生命值: {currentHealth}");
         }
 
-        //TODO： 刷新UI血条
+        //刷新UI血条
+        EventCenter.EventTrigger<UpdateHealthEvent>(new UpdateHealthEvent(playerBaseInfo.currentHealth, playerBaseInfo.maxHealth));
         //TODO: 播放受伤动画
 
 

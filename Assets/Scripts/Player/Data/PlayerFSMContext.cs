@@ -68,27 +68,41 @@ public class PlayerFSMContext : FSMContext
     // public GameObject weapon;       //标记武器对象位置
     //[HideInInspector]public GameObject weaponModel; //实际武器实例
     //public TwoBoneIKConstraint LeftHandIK;
-    public TwoBoneIKConstraint rightHandIK; //TODO:后续需要根据武器类型切换IK约束
-    public MultiAimConstraint handAim;
-    
+
+    [Tooltip("头顶位置")]
     public Transform headPivot;//头顶位置
-
     [HideInInspector]public ClimbDetector climbDetector;//攀爬检测器
-
-
     #endregion
+    [Space(10)]
 
     #region 瞄准相关
     [Header("瞄准相关")]
+    [Header("IK约束")]
+    public TwoBoneIKConstraint rightHandIK; //TODO:后续需要根据武器类型切换IK约束
+
+    [Tooltip("手部瞄准")]
+    public MultiAimConstraint handAim;
+    //躯干瞄准链：只在瞄准时打开，且只分担一部分俯仰（全部权重会让整个上半身跟着准星扭）
+    [Header("躯干瞄准链:只在瞄准时打开，且只分担一部分俯仰（全部权重会让整个上半身跟着准星扭")]
+
+    [Tooltip("躯干瞄准")]
+    public MultiAimConstraint spineAim;
+    //躯干瞄准权重：瞄准时脊柱/胸各承担多少俯仰，0 表示完全不跟
+    [Range(0f, 1f)] public float spineAimWeight = 0.2f;
+    [Tooltip("胸部瞄准")]
+    public MultiAimConstraint chestAim;
+    [Range(0f, 1f)] public float chestAimWeight = 0.35f;
     public Transform aimPivot;
 
     //[HideInInspector]public Transform firePoint;
     // 瞄准时的俯仰角度
-    public float aimPitchMin = -30f;
-    public float aimPitchMax = 30f;
+    [Range(-90f, 90f)] public float aimPitchMin = -30f;
+    [Range(-90f, 90f)] public float aimPitchMax = 30f;
     public float aimPitch = 0;
     
     public float mouseSensitivity = 2f;// 鼠标灵敏度
+
+    public float aimWeightFadeSpeed = 4f;// 权重淡入速度（每秒）
     #endregion
 
     #region 重力与跳跃系统
