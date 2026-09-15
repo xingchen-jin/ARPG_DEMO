@@ -240,7 +240,13 @@ public class EnemyBase : MonoBehaviour, IDamageable
         }
     }
 
-
+    /// <summary>
+    /// 绘制一个平面圆形，用于表示攻击范围
+    /// </summary>
+    /// <param name="center">圆形中心</param>
+    /// <param name="radius">圆形半径</param>
+    /// <param name="color">圆形颜色</param>
+    /// <param name="segments">圆形分段数</param>
     private void DrawFlatCircle(Vector3 center, float radius,Color color,int segments = 64)
     {
         //更改画笔元素
