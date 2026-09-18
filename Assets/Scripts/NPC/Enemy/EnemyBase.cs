@@ -56,9 +56,6 @@ public class EnemyBase : MonoBehaviour, IDamageable
     {
         anim = GetComponent<Animator>();
         behaviorTree = GetComponent<BehaviorTree>();
-
-        //将敌人数据传递给行为树
-        SyncAttackDistanceToBehaviorTree();
     }
     void Update()
     {
@@ -79,7 +76,6 @@ public class EnemyBase : MonoBehaviour, IDamageable
     void OnEnable()
     {
         if(isSceneOriginObj)return; // 如果是场景天然存在的敌人，则不从数据库中获取数据
-
         Init(); 
     }
 
@@ -178,7 +174,7 @@ public class EnemyBase : MonoBehaviour, IDamageable
 
         //数据是从数据库重新取的，行为树里的攻击范围要同步刷新，
         //否则行为树还在用 Awake 时写入的预制体数值，和 ChaseTarget 使用的攻击范围不一致。
-        SyncAttackDistanceToBehaviorTree();
+        InitBehaviorTreeData();
     }
 
     /// <summary>
@@ -201,13 +197,15 @@ public class EnemyBase : MonoBehaviour, IDamageable
     }
     #region 行为树设置
     /// <summary>
-    /// 把当前的攻击范围同步给行为树，保证行为树判断和移动逻辑用的是同一个值
+    /// 初始化行为树数据，将敌人的攻击范围写入行为树变量
     /// </summary>    
-    private void SyncAttackDistanceToBehaviorTree()
+    private void InitBehaviorTreeData()
     {
         if (behaviorTree != null && enemyData != null)
         {
             behaviorTree.SetVariableValue("AttackDistance", enemyData.attackDistance);
+            behaviorTree.SetVariableValue("PatrolRadius", enemyData.patrolRadius);
+            behaviorTree.SetVariableValue("PatrolCenter", transform.position);
         }
     }
     #endregion

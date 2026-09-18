@@ -36,7 +36,6 @@ public class WeaponController : MonoBehaviour
         int itemID = weaponDataChangedEvent.itemID;
         if (itemID <= 0)
         {
-            Debug.LogWarning("武器ID异常传入,显示空手");
             UnequipWeapon();
             return;
         }

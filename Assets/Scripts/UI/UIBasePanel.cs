@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public abstract class UIBasePanel : MonoBehaviour
 {
    public virtual bool BlocksPlayerInput => false;
-
    //记录所有子控件的字典
    //key:控件名字 value:控件对象
    private Dictionary<string,UIBehaviour> controlDict = new Dictionary<string, UIBehaviour>();

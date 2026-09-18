@@ -82,3 +82,18 @@ public struct UpdateHealthEvent : IEvent
     }
 }
 #endregion
+
+#region 场景相关事件
+/// <summary>
+/// 场景加载进度变化事件
+/// 传递一个float类型的进度值[0-1]
+/// </summary>
+public struct SceneLoadChangeEvent : IEvent
+{
+    public float progress;
+    public SceneLoadChangeEvent(float progress)
+    {
+        this.progress = progress;
+    }
+}
+#endregion

@@ -21,7 +21,7 @@ public class Partol : Action
     [Tooltip("到达目标点的判定距离")]
     public SharedVariable<float> arrivalDistance = 1f;
     [Tooltip("可选的巡逻中心点，留空则使用自身位置")]
-    public SharedVariable<Transform> patrolCenter;
+    public SharedVariable<Vector3> patrolCenter;
 
     // [Header("动画参数")]
     // [Tooltip("要播放的动画状态名")]
@@ -60,7 +60,7 @@ public class Partol : Action
         _hasTarget = false;
         _waitTimer = 0f;
         _retryCount = 0;
-        _fixedCenterPoint = patrolCenter != null && patrolCenter.Value != null ? patrolCenter.Value.position : transform.position;
+        _fixedCenterPoint = patrolCenter != null && patrolCenter.Value != null ? patrolCenter.Value : transform.position;
         SetNewTargetPoint();
 
         // m_AnimationStateHash = Animator.StringToHash(m_AnimationStateName);

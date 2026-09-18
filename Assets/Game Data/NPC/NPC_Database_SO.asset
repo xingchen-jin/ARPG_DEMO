@@ -17,6 +17,8 @@ MonoBehaviour:
     npcName: "\u6DF1\u6E0A\u4EBA\u5F62\u9B54\u7269"
     npcPrefab: {fileID: 8371692083697577207, guid: a109557cf2f2d9b41baa13a276a54a4a,
       type: 3}
+    radius: 0.5
+    height: 1.8
     maxHealth: 100
     currentHealth: 100
     walkSpeed: 2.5
@@ -26,5 +28,5 @@ MonoBehaviour:
     attackSphereRadius: 0.5
     attackDamage: 5
     attackCooldown: 1.5
-    patrolRange: 5
+    patrolRadius: 10
     isGuard: 0

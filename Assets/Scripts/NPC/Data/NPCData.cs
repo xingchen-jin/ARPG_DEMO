@@ -5,9 +5,15 @@ using UnityEngine;
 [System.Serializable]
 public class NPCData
 {
+    [Header("基础信息")]
     public int npcID;
     public string npcName;
     public GameObject npcPrefab;
+
+    [Header("手动设置的碰撞体相关，用于检测敌人重叠")]
+    public float radius;
+    public float height;
+
     [Header("基础属性")]
     [Tooltip("最大生命值")]
     public float maxHealth;
@@ -35,7 +41,7 @@ public class EnemyData : NPCData
     [Header("攻击冷却")]
     public float attackCooldown;
     [Header("巡逻范围")]
-    public float patrolRange;
+    public float patrolRadius;
     [Header("是否为守卫")]
     public bool isGuard;
 

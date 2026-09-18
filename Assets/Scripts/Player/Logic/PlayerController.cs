@@ -216,23 +216,9 @@ public class PlayerController : MonoBehaviour,IDamageable
         float currentHealth = playerBaseInfo.currentHealth;
         currentHealth -= damage;
         playerBaseInfo.currentHealth = currentHealth;
-        if (currentHealth <= 0)
-        {
-            // 处理玩家死亡逻辑
-            Debug.Log("玩家死亡！");
-            //TODO: 可以在这里触发玩家死亡动画、游戏结束等逻辑
-        }
-        else
-        {
-            // 处理玩家受伤逻辑
-            Debug.Log($"玩家受到 {damage} 点伤害！当前生命值: {currentHealth}");
-        }
-
         //刷新UI血条
         EventCenter.EventTrigger<UpdateHealthEvent>(new UpdateHealthEvent(playerBaseInfo.currentHealth, playerBaseInfo.maxHealth));
         //TODO: 播放受伤动画
-
-
-
+        
     }
 }

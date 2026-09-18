@@ -16,6 +16,22 @@ public enum UILevel
 }
 public class UIManager : BaseManager<UIManager>
 {
+    private abstract class UiBaseInfo{}
+    /// <summary>
+    /// UI信息类
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    private class UIInfo<T> : UiBaseInfo where T : UIBasePanel
+    {
+        public UnityAction<T> callback;
+        public T panel;
+        public bool isHide;
+        public UIInfo(UnityAction<T> callback)
+        {
+            this.callback += callback;
+            isHide = false;
+        }
+    }
     //ui必要组件
     //private Camera uiCamera;
     private Canvas uiCanvas;
@@ -29,7 +45,7 @@ public class UIManager : BaseManager<UIManager>
     /// <summary>
     /// 存储所有的面板对象
     /// </summary>
-    private Dictionary<string, UIBasePanel> panelDic = new Dictionary<string, UIBasePanel>();
+    private Dictionary<string, UiBaseInfo> panelDic = new Dictionary<string, UiBaseInfo>();
     private static string uiPath = "UI/";
     private static string canvasPath = "UI/Canvas";
     private static string eventSystemPath = "UI/EventSystem";
@@ -105,67 +121,145 @@ public class UIManager : BaseManager<UIManager>
     /// 显示面板
     /// </summary>
     /// <param name="panelName">面板名称</param>
-    /// <param name="level"></param>
-    /// <param name="callback"></param>
-    /// <param name="isSync"></param>
+    /// <param name="level">ui层级（默认Middle）</param>
+    /// <param name="callback">回调</param>
+    /// <param name="isSync">是否同步加载</param>
     public void ShowPanel<T>( UILevel level = UILevel.Middle,UnityAction<T> callback = null,bool isSync = false)where T:UIBasePanel
     {
         //获取面板名 预设体名必须和面板类名一致 
         string panelName = typeof(T).Name;
-        UIBasePanel panel;
         //加载面板预设体
-        if(panelDic.TryGetValue(panelName, out panel))
+        if(panelDic.TryGetValue(panelName, out UiBaseInfo uiInfo))
         {
-            //面板已经存在 直接显示
-            panel.ShowMe();
-            panel.gameObject.SetActive(true);
-            callback?.Invoke(panel as T);
+            //获取ui信息类
+            UIInfo<T> info = panelDic[panelName] as UIInfo<T>;
+            if(info.panel == null)
+            {
+                //如果隐藏后又显示把isHide设为false
+                info.isHide = false;
+                //还在加载中
+                if(callback != null)
+                {
+                    info.callback += callback;
+                }
+                return;
+            }
+            if(info.panel.gameObject.activeSelf == false)
+            {
+                info.panel.gameObject.SetActive(true);
+            }
+            info.panel.ShowMe();
+            callback?.Invoke(info.panel as T);
         }
         else
         {
             //面板不存在 需要加载
-            //TODO: 这里可以使用异步加载的方式
-            GameObject panelObj = GameObject.Instantiate(ResManager.Instance.Load<GameObject>($"{uiPath}{panelName}"), GetLayerParent(level), false);
-            if (panelObj == null)
+            panelDic.Add(panelName,new UIInfo<T>(callback));
+            //异步加载
+            if (!isSync)
             {
-                Debug.LogError($"面板{panelName}加载失败");
-                return;
+                ResManager.Instance.LoadAsync<GameObject>($"{uiPath}{panelName}", (value)=>{
+                    GameObject panelObj = GameObject.Instantiate(value);
+                    panelObj.transform.SetParent(GetLayerParent(level) == null ? middleLayer : GetLayerParent(level), false);
+                    T panel = panelObj.GetComponent<T>();
+                    if (panel == null)
+                    {
+                        Debug.LogError($"面板{panelName}上没有挂载{typeof(T)}组件");
+                        return;
+                    }
+                    //获取ui信息类
+                    UIInfo<T> info = panelDic[panelName] as UIInfo<T>;
+                    //执行回调
+                    info.callback?.Invoke(panel as T);
+                    //清空回调，避免内存泄漏
+                    info.callback = null; 
+                    //面板加载完成后根据isHide的值决定是否显示
+                    if (info.isHide)
+                    {
+                        if(panelObj.activeSelf)
+                            panelObj.SetActive(false);
+                        panel.HideMe();
+                        info.isHide = false; //重置isHide状态
+                    }else
+                    {
+                        if(!panelObj.activeSelf)
+                            panelObj.SetActive(true);
+                        panel.ShowMe();
+                    }
+
+                    //存储到字典中
+                    info.panel = panel;
+                    // panelDic[panelName]
+                    });
             }
-            panel = panelObj.GetComponent<T>();
-            if (panel == null)
+            //同步加载
+            else
             {
-                Debug.LogError($"面板{panelName}上没有挂载{typeof(T)}组件");
-                return;
+                GameObject panelObj = GameObject.Instantiate(ResManager.Instance.Load<GameObject>($"{uiPath}{panelName}"));
+                panelObj.transform.SetParent(GetLayerParent(level) == null ? middleLayer : GetLayerParent(level), false);
+                T panel = panelObj.GetComponent<T>();
+                if (panel == null)
+                {
+                    Debug.LogError($"面板{panelName}上没有挂载{typeof(T)}组件");
+                    return;
+                }
+                //获取ui信息类
+                UIInfo<T> info = panelDic[panelName] as UIInfo<T>;
+                //执行回调
+                info.callback?.Invoke(panel as T);
+                //清空回调，避免内存泄漏
+                info.callback = null; 
+                //面板加载完成后根据isHide的值决定是否显示
+                if (info.isHide)
+                {
+                    if(panelObj.activeSelf)
+                        panelObj.SetActive(false);
+                    panel.HideMe();
+                    info.isHide = false; //重置isHide状态
+                }else
+                {
+                    if(!panelObj.activeSelf)
+                        panelObj.SetActive(true);
+                    panel.ShowMe();
+                }
+
+                //存储到字典中
+                info.panel = panel;
             }
-            //面板显示时会调用一次默认的显示逻辑
-            panel.ShowMe();
-            //执行回调
-            callback?.Invoke(panel as T);
-            //存储到字典中
-            panelDic.Add(panelName, panel);
+
         }
-            // if (panel != null)
-            // {
-            //     if (panel.BlocksPlayerInput)
-            //     {
-            //         EventCenter.EventTrigger<SwitchInputModeEvent>(new SwitchInputModeEvent(InputMode.UI));
-            //     }
-            // }
-    
     }
     /// <summary>
     /// 关闭面板
     /// </summary>
+    /// <param name="isDestory">是否销毁面板</param>
     /// <typeparam name="T"></typeparam>
-    public void HidePanel<T>() where T : UIBasePanel
+    public void HidePanel<T>(bool isDestory = false) where T : UIBasePanel
     {
         string panelName = typeof(T).Name;
         if (panelDic.ContainsKey(panelName))
         {
-            //执行默认隐藏逻辑
-            panelDic[panelName].HideMe();
-            //面板存在，隐藏它
-            panelDic[panelName].gameObject.SetActive(false);
+            UIInfo<T> info = panelDic[panelName] as UIInfo<T>;
+            //面板加载完成
+            if(info.panel != null)
+            {
+                if (isDestory)
+                {
+                    GameObject.Destroy(info.panel.gameObject);
+                    panelDic.Remove(panelName);
+                    return;
+                }
+                info.panel.HideMe();
+                if(info.panel.gameObject.activeSelf)
+                    info.panel.gameObject.SetActive(false);
+            }
+            //面板未加载完成
+            else
+            {
+                //标记为隐藏
+                info.isHide = true;
+                info.callback = null; //清空回调，避免加载完成后执行
+            }
         }
         else
         {
@@ -183,7 +277,10 @@ public class UIManager : BaseManager<UIManager>
         if (panelDic.ContainsKey(panelName))
         {
             //面板存在，销毁它
-            GameObject.Destroy(panelDic[panelName].gameObject);
+            if(panelDic[panelName] is UIInfo<T> info && info.panel != null)
+            {
+                GameObject.Destroy(info.panel.gameObject);
+            }
             panelDic.Remove(panelName);
         }
         else
@@ -196,18 +293,50 @@ public class UIManager : BaseManager<UIManager>
     /// 获取面板对象
     /// </summary>
     /// <typeparam name="T">面板类型</typeparam>
+    /// <param name="callback">回调函数</param>
     /// <returns></returns>
-    public T GetPanel<T>() where T : UIBasePanel
+    public void GetPanel<T>(UnityAction<T> callback) where T : UIBasePanel
     {
         string panelName = typeof(T).Name;
         if (panelDic.ContainsKey(panelName))
         {
-            return panelDic[panelName] as T;
+            UIInfo<T> info = panelDic[panelName] as UIInfo<T>;
+            //加载结束
+            if(info.panel != null)
+            {
+                callback?.Invoke(info.panel);
+            }
+            //正在加载中
+            else
+            {
+                //面板还在加载中，添加回调
+                info.callback += callback;
+            }
         }
         else
         {
             Debug.LogWarning($"面板{panelName}不存在");
-            return null;
         }
+    }
+   
+    /// <summary>
+    /// 为控件添加自定义事件
+    /// </summary>
+    /// <param name="control">待添加事件的控件</param>
+    /// <param name="eventType">事件类型</param>
+    /// <param name="callback">响应函数</param>
+    public static void AddCustomEventListener(UIBehaviour control, EventTriggerType eventType, UnityAction<BaseEventData> callback)
+    {
+        //获取或添加EventTrigger组件
+        EventTrigger trigger = control.GetComponent<EventTrigger>();
+        if (trigger == null)
+        {
+            trigger = control.gameObject.AddComponent<EventTrigger>();
+        }
+        //创建一个新的事件条目
+        EventTrigger.Entry entry = new EventTrigger.Entry();
+        entry.eventID = eventType;
+        entry.callback.AddListener(callback);
+        trigger.triggers.Add(entry);
     }
 }

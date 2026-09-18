@@ -25,6 +25,10 @@ public class ChaseTarget : Action
     [Tooltip("停止距离 = 攻击范围 × 该系数。留出一段滞回距离，避免刚好停在攻击范围边界上导致行为分支来回切换。")]
     [SerializeField, Range(0.1f, 1f)] private float stoppingDistanceScale = 0.8f;
 
+    [Header("最大追逐距离")]
+    [Tooltip("超过该距离就放弃追逐，返回失败")]
+    [SerializeField] private float maxChaseDistance = 20f;
+
     //私有属性
     private Transform _targetTransform;
     private NavMeshAgent _agent;
@@ -72,8 +76,19 @@ public class ChaseTarget : Action
 
         //目标可能在追逐途中被替换或销毁，每帧重新取一次
         _targetTransform = ResolveTargetTransform();
+
         if (_targetTransform == null)
+        {
+            Debug.LogWarning($"[ChaseTarget] {gameObject.name} 没有有效的追逐目标！");
+            return TaskStatus.Failure; // 没有目标，返回失败
+        }
+        // 检查是否超过最大追逐距离
+        if (Vector3.Distance(transform.position, _targetTransform.position) > maxChaseDistance && _npcPerception.DetectedPlayer != _targetTransform)
+        {
+            target.Value = null; // 放弃追逐，清空目标
             return TaskStatus.Failure;
+        }
+
 
         // 设置目标位置
         if (!_hasSetDestination || Vector3.Distance(_lastTargetPosition, _targetTransform.position) > repathThreshold)
@@ -113,21 +128,24 @@ public class ChaseTarget : Action
     #endregion
 
     #region 私有方法
-    /// <summary>
-    /// 取当前要追逐的目标：
-    /// 优先使用行为树共享变量，变量未绑定或目标已销毁时退回到 NPCPerception 检测到的玩家，
-    /// 保证即使图中变量没连好也不会出现“看得到却追不上去”的情况。
-    /// </summary>
+
+    // /// <summary>
+    // /// 取当前要追逐的目标：
+    // /// 优先使用行为树共享变量，变量未绑定或目标已销毁时退回到 NPCPerception 检测到的玩家，
+    // /// 保证即使图中变量没连好也不会出现“看得到却追不上去”的情况。
+    // /// </summary>
     private Transform ResolveTargetTransform()
     {
-        if (target != null && target.Value != null)
+        
+        if (target != null)
         {
-            return target.Value.transform;
+            return target.Value != null ? target.Value.transform : null;
         }
-        if (_npcPerception != null && _npcPerception.DetectedPlayer != null)
-        {
-            return _npcPerception.DetectedPlayer;
-        }
+
+        // if (_npcPerception != null && _npcPerception.DetectedPlayer != null)
+        // {
+        //     return _npcPerception.DetectedPlayer;
+        // }
         return null;
     }
 
