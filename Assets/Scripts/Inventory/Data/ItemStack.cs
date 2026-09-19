@@ -7,6 +7,7 @@ public class ItemStack
 {
     public int itemID;
     public int quantity;
+    public ItemType ItemType => ItemManager.Instance.GetItemBase(itemID)?.ItemType ?? ItemType.None;
     public ItemStack(int itemID, int quantity)
     {
         this.itemID = itemID;

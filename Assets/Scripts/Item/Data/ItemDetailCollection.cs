@@ -1,10 +1,12 @@
 using UnityEngine;
 public enum ItemType
 {
+    None,   //无
     Firearm, //枪械
     Ammo,    //弹药
     Armor,  //护甲
-    Consumable, //消耗品
+    Food,   //食物
+    Cure,  //治疗物品
     QuestItem   //任务物品
 }
 

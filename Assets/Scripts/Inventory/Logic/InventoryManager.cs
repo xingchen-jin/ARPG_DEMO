@@ -50,41 +50,35 @@ public class InventoryManager : Singleton<InventoryManager>
             
     }
     #region 一般物品管理
-    /// <summary>
-    /// 添加物品到背包
-    /// </summary>
-    /// <param name="itemID"></param>
-    /// <param name="quantity"></param>
-    public void AddItemStack(int itemID, int quantity)
+    public List<ItemStack> GetAllItemStacks(ItemType itemType)
     {
-        ItemStack existingStack = inventoryData.GetItemStack(itemID);
-        if (existingStack != null)
+        if (inventoryData.ItemStacksDictionary.TryGetValue(itemType, out var itemStacks))
         {
-            existingStack.quantity += quantity;
+            return itemStacks;
         }
-        else
-        {
-            inventoryData.itemStacks.Add(new ItemStack(itemID, quantity));
-        }
+        return new List<ItemStack>();
     }
 
     /// <summary>
-    /// 从背包中移除物品
+    /// 添加物品到背包
     /// </summary>
     /// <param name="itemID">物品ID</param>
     /// <param name="quantity">数量</param>
-    public void RemoveItem(int itemID, int quantity)
+    public void AddItem(int itemID, int quantity)
     {
-        ItemStack existingStack = inventoryData.GetItemStack(itemID);
-        if (existingStack != null)
-        {
-            existingStack.quantity -= quantity;
-            if (existingStack.quantity <= 0)
-            {
-                inventoryData.itemStacks.Remove(existingStack);
-            }
-        }
+        inventoryData.AddItem(itemID, quantity);
     }
+
+    /// <summary>
+    /// 从背包中移除物品（当所需要删除的不足时拒绝并返回false）
+    /// </summary>
+    /// <param name="itemID">物品ID</param>
+    /// <param name="quantity">数量</param>
+    public bool RemoveItem(int itemID, int quantity)
+    {
+        return inventoryData.RemoveItem(itemID, quantity);
+    }
+
     #endregion
 
     #region 武器管理
