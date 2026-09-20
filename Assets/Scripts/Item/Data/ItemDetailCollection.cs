@@ -28,6 +28,31 @@ public class ItemBase
     public GameObject Prefab => prefab;
     public string Description => description;
 }
+public static class ItemTypeHelper
+{
+    public static string GetItemTypeName(ItemType itemType)
+    {
+        switch (itemType)
+        {
+            case ItemType.Ammo:
+                return "弹药";
+            case ItemType.Firearm:
+                return "枪械";
+            case ItemType.Armor:
+                return "护甲";
+            case ItemType.Food:
+                return "食物";
+            case ItemType.Cure:
+                return "药品";
+            case ItemType.QuestItem:
+                return "任务物品";
+            case ItemType.None:
+                return "无类型";
+            default:
+                return "未知类型";
+        }
+    }
+}
 
 #region 具体物品类型的详细信息类
 [System.Serializable]

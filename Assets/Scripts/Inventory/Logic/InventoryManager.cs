@@ -50,6 +50,11 @@ public class InventoryManager : Singleton<InventoryManager>
             
     }
     #region 一般物品管理
+    /// <summary>
+    /// 返回指定类型的数据列表
+    /// </summary>
+    /// <param name="itemType">物品类型</param>
+    /// <returns></returns>
     public List<ItemStack> GetAllItemStacks(ItemType itemType)
     {
         if (inventoryData.ItemStacksDictionary.TryGetValue(itemType, out var itemStacks))

@@ -32,3 +32,22 @@ MonoBehaviour:
     icon: {fileID: -1386997210, guid: 53ae94a7e9529554aae48bf4653e9021, type: 3}
     prefab: {fileID: 1095254202041702, guid: 6273e2936e9d6a24e9f64c7c70d6bd19, type: 3}
     description: "\u8D64\u624B\u7A7A\u62F3"
+  - itemID: 1004
+    itemName: "\u82F9\u679C"
+    itemType: 4
+    icon: {fileID: 21300000, guid: 124fa7c3be5034ae9ac8aa169c08f107, type: 3}
+    prefab: {fileID: 7012504825455764868, guid: 74076464298f2d049b5dd4a1a759eacc,
+      type: 3}
+    description: "\u8FD9\u662F\u4E00\u4E2A\u65B0\u9C9C\u7684\u82F9\u679C"
+  - itemID: 1005
+    itemName: "\u85AF\u7247"
+    itemType: 4
+    icon: {fileID: 21300000, guid: 8477e019237bf44b987eebcbc408d5dc, type: 3}
+    prefab: {fileID: 919132149155446097, guid: def296b2a737f694fb1f51544a8b7b90, type: 3}
+    description: "\u8FD9\u662F\u4E00\u4E2A\u65B0\u9C9C\u7684\u82F9\u679C"
+  - itemID: 1006
+    itemName: "\u533B\u7597\u7BB1\u5B50"
+    itemType: 5
+    icon: {fileID: 21300000, guid: b0c0ed5104dd04774bf65560e42807f7, type: 3}
+    prefab: {fileID: 919132149155446097, guid: def296b2a737f694fb1f51544a8b7b90, type: 3}
+    description: "\u8FD9\u662F\u4E00\u4E2A\u65B0\u9C9C\u7684\u82F9\u679C"
